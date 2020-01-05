@@ -1,19 +1,19 @@
+import * as path from "path";
 import * as core from '@actions/core'
-import {wait} from './wait'
 
-async function run(): Promise<void> {
-  try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`)
+import * as validate from "./validate"
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
 
-    core.setOutput('time', new Date().toTimeString())
-  } catch (error) {
-    core.setFailed(error.message)
-  }
+export async function run(): Promise<void> {
+    try {
+        const allowSnapshots = core.getInput("allow-snapshots") == "true"
+        const invalidWrapperJars = await validate.findInvalidWrapperJars(path.resolve('.'), allowSnapshots)
+        if (invalidWrapperJars.length > 0) {
+            core.setFailed("Invalid wrapper jars " + invalidWrapperJars)
+        }
+    } catch (error) {
+        core.setFailed(error.message)
+    }
 }
 
 run()

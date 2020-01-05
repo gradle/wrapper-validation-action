@@ -1,10 +1,11 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Gradle Wrapper Check'
+description: 'Check Gradle Wrapper Files'
+author: 'Gradle'
 inputs:
-  myInput:              # change this
-    description: 'input description here'
-    default: 'default value if applicable'
+  allow-snapshots:
+    description: 'Allow snapshot Gradle versions'
+    required: false
+    default: 'false'
 runs:
   using: 'node12'
   main: 'dist/index.js'
