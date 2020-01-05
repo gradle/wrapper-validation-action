@@ -4,7 +4,7 @@ import {Repository, Commit, Tree, TreeEntry} from 'nodegit'
 export async function findWrapperJars(gitRepoPath: string): Promise<string[]> {
 
     let repo: Repository = await Repository.open(gitRepoPath)
-    let commit: Commit = await repo.getMasterCommit()
+    let commit: Commit = await repo.getHeadCommit()
     let tree: Tree = await commit.getTree()
     let walker = tree.walk()
 
