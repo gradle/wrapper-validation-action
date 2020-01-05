@@ -1,0 +1,41 @@
+# These are the steps used in a container-based build in VSTS.
+steps:
+- ${{ if eq(parameters.qemu, 'true') }}:
+  - script: docker run --rm --privileged multiarch/qemu-user-static:register --reset
+    displayName: 'Register Docker QEMU'
+
+- script: |
+    cd $(Build.SourcesDirectory)/azure-pipelines/docker
+    docker build -t libgit2/${{parameters.docker.image}} --build-arg BASE=${{parameters.docker.base}} -f ${{parameters.docker.image}} .
+  displayName: 'Build Docker image'
+- task: docker@0
+  displayName: Build
+  inputs:
+    action: 'Run an image'
+    imageName: libgit2/${{ parameters.docker.image }}
+    volumes: |
+     $(Build.SourcesDirectory):/src
+     $(Build.BinariesDirectory):/build
+    envVars: ${{ parameters.environmentVariables }}
+    workDir: '/build'
+    containerCommand: '/src/azure-pipelines/build.sh'
+    detached: false
+- task: docker@0
+  displayName: Test
+  inputs:
+    action: 'Run an image'
+    imageName: libgit2/${{ parameters.docker.image }}
+    volumes: |
+     $(Build.SourcesDirectory):/src
+     $(Build.BinariesDirectory):/build
+    envVars: ${{ parameters.environmentVariables }}
+    workDir: '/build'
+    containerCommand: '/src/azure-pipelines/test.sh'
+    detached: false
+- task: publishtestresults@2
+  displayName: Publish Test Results
+  condition: succeededOrFailed()
+  inputs:
+    testResultsFiles: 'results_*.xml'
+    searchFolder: '$(Build.BinariesDirectory)'
+    mergeTestResults: true

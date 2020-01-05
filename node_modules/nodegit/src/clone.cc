@@ -1,0 +1,252 @@
+// This is a generated file, modify: generate/templates/templates/class_content.cc
+
+#include <nan.h>
+#include <string.h>
+
+extern "C" {
+  #include <git2.h>
+ }
+
+#include "../include/nodegit.h"
+#include "../include/lock_master.h"
+#include "../include/functions/copy.h"
+#include "../include/clone.h"
+#include "nodegit_wrapper.cc"
+#include "../include/async_libgit2_queue_worker.h"
+
+  #include "../include/repository.h"
+  #include "../include/clone_options.h"
+ 
+#include <iostream>
+
+using namespace std;
+using namespace v8;
+using namespace node;
+
+ 
+  void GitClone::InitializeComponent(v8::Local<v8::Object> target) {
+    Nan::HandleScope scope;
+
+      v8::Local<FunctionTemplate> object = Nan::New<FunctionTemplate>(Clone);
+         Nan::SetMethod(object, "clone", Clone);
+  
+    Nan::Set(
+      target,
+      Nan::New("Clone").ToLocalChecked(),
+        Nan::GetFunction(object).ToLocalChecked()
+     );
+  }
+
+       // NOTE you may need to occasionally rebuild this method by calling the generators
+// if major changes are made to the templates / generator.
+
+// Due to some file locking issues, we have the need to free a repository after it's cloned.
+// We do not expose free functions to javascript, and so, we've moved the implementation of
+// cloning, freeing the repo, and opening the repo into a custom template.
+
+/*
+ * @param String url
+ * @param String local_path
+ * @param CloneOptions options
+ * @param Repository callback
+ */
+NAN_METHOD(GitClone::Clone) {
+
+  if (info.Length() == 0 || !info[0]->IsString()) {
+    return Nan::ThrowError("String url is required.");
+  }
+
+  if (info.Length() == 1 || !info[1]->IsString()) {
+    return Nan::ThrowError("String local_path is required.");
+  }
+
+  if (info.Length() == 3 || !info[3]->IsFunction()) {
+    return Nan::ThrowError("Callback is required and must be a Function.");
+  }
+
+  CloneBaton *baton = new CloneBaton;
+
+  baton->error_code = GIT_OK;
+  baton->error = NULL;
+
+  // start convert_from_v8 block
+  const char *from_url = NULL;
+
+  Nan::Utf8String url(Nan::To<v8::String>(info[0]).ToLocalChecked());
+  // malloc with one extra byte so we can add the terminating null character
+  // C-strings expect:
+  from_url = (const char *)malloc(url.length() + 1);
+  // copy the characters from the nodejs string into our C-string (used instead
+  // of strdup or strcpy because nulls in the middle of strings are valid coming
+  // from nodejs):
+  memcpy((void *)from_url, *url, url.length());
+  // ensure the final byte of our new string is null, extra casts added to
+  // ensure compatibility with various C types used in the nodejs binding
+  // generation:
+  memset((void *)(((char *)from_url) + url.length()), 0, 1);
+  // end convert_from_v8 block
+  baton->url = from_url;
+  // start convert_from_v8 block
+  const char *from_local_path = NULL;
+
+  Nan::Utf8String local_path(Nan::To<v8::String>(info[1]).ToLocalChecked());
+  // malloc with one extra byte so we can add the terminating null character
+  // C-strings expect:
+  from_local_path = (const char *)malloc(local_path.length() + 1);
+  // copy the characters from the nodejs string into our C-string (used instead
+  // of strdup or strcpy because nulls in the middle of strings are valid coming
+  // from nodejs):
+  memcpy((void *)from_local_path, *local_path, local_path.length());
+  // ensure the final byte of our new string is null, extra casts added to
+  // ensure compatibility with various C types used in the nodejs binding
+  // generation:
+  memset((void *)(((char *)from_local_path) + local_path.length()), 0, 1);
+  // end convert_from_v8 block
+  baton->local_path = from_local_path;
+  // start convert_from_v8 block
+  const git_clone_options *from_options = NULL;
+  if (info[2]->IsObject()) {
+    from_options = Nan::ObjectWrap::Unwrap<GitCloneOptions>(Nan::To<v8::Object>(info[2]).ToLocalChecked())
+                       ->GetValue();
+  } else {
+    from_options = 0;
+  }
+  // end convert_from_v8 block
+  baton->options = from_options;
+
+  Nan::Callback *callback =
+      new Nan::Callback(v8::Local<Function>::Cast(info[3]));
+  CloneWorker *worker = new CloneWorker(baton, callback);
+
+  if (!info[0]->IsUndefined() && !info[0]->IsNull())
+    worker->SaveToPersistent("url", Nan::To<v8::Object>(info[0]).ToLocalChecked());
+  if (!info[1]->IsUndefined() && !info[1]->IsNull())
+    worker->SaveToPersistent("local_path", Nan::To<v8::Object>(info[1]).ToLocalChecked());
+  if (!info[2]->IsUndefined() && !info[2]->IsNull())
+    worker->SaveToPersistent("options", Nan::To<v8::Object>(info[2]).ToLocalChecked());
+
+  AsyncLibgit2QueueWorker(worker);
+  return;
+}
+
+void GitClone::CloneWorker::Execute() {
+  git_error_clear();
+
+  {
+    LockMaster lockMaster(
+        /*asyncAction: */ true, baton->url, baton->local_path, baton->options);
+
+    git_repository *repo;
+    int result =
+        git_clone(&repo, baton->url, baton->local_path, baton->options);
+
+    if (result == GIT_OK) {
+      // This is required to clean up after the clone to avoid file locking
+      // issues in Windows and potentially other issues we don't know about.
+      git_repository_free(repo);
+
+      // We want to provide a valid repository object, so reopen the repository
+      // after clone and cleanup.
+      result = git_repository_open(&baton->out, baton->local_path);
+    }
+
+    baton->error_code = result;
+
+    if (result != GIT_OK && git_error_last() != NULL) {
+      baton->error = git_error_dup(git_error_last());
+    }
+  }
+}
+
+void GitClone::CloneWorker::HandleOKCallback() {
+  if (baton->error_code == GIT_OK) {
+    v8::Local<v8::Value> to;
+    // start convert_to_v8 block
+
+    if (baton->out != NULL) {
+      // GitRepository baton->out
+      to = GitRepository::New(baton->out, true);
+    } else {
+      to = Nan::Null();
+    }
+
+    // end convert_to_v8 block
+    v8::Local<v8::Value> result = to;
+
+    v8::Local<v8::Value> argv[2] = {Nan::Null(), result};
+    callback->Call(2, argv, async_resource);
+  } else {
+    if (baton->error) {
+      v8::Local<v8::Object> err;
+      if (baton->error->message) {
+        err = Nan::To<v8::Object>(Nan::Error(baton->error->message)).ToLocalChecked();
+      } else {
+        err = Nan::To<v8::Object>(Nan::Error("Method clone has thrown an error.")).ToLocalChecked();
+      }
+      Nan::Set(err, Nan::New("errno").ToLocalChecked(), Nan::New(baton->error_code));
+      Nan::Set(err, Nan::New("errorFunction").ToLocalChecked(),
+               Nan::New("Clone.clone").ToLocalChecked());
+      v8::Local<v8::Value> argv[1] = {err};
+      callback->Call(1, argv, async_resource);
+      if (baton->error->message)
+        free((void *)baton->error->message);
+      free((void *)baton->error);
+    } else if (baton->error_code < 0) {
+      std::queue<v8::Local<v8::Value>> workerArguments;
+      workerArguments.push(GetFromPersistent("url"));
+      workerArguments.push(GetFromPersistent("local_path"));
+      workerArguments.push(GetFromPersistent("options"));
+      bool callbackFired = false;
+      while (!workerArguments.empty()) {
+        v8::Local<v8::Value> node = workerArguments.front();
+        workerArguments.pop();
+
+        if (!node->IsObject() || node->IsArray() || node->IsBooleanObject() ||
+            node->IsDate() || node->IsFunction() || node->IsNumberObject() ||
+            node->IsRegExp() || node->IsStringObject()) {
+          continue;
+        }
+
+        v8::Local<v8::Object> nodeObj = Nan::To<v8::Object>(node).ToLocalChecked();
+        v8::Local<v8::Value> checkValue = GetPrivate(
+            nodeObj, Nan::New("NodeGitPromiseError").ToLocalChecked());
+
+        if (!checkValue.IsEmpty() && !checkValue->IsNull() &&
+            !checkValue->IsUndefined()) {
+          v8::Local<v8::Value> argv[1] = {Nan::To<v8::Object>(checkValue).ToLocalChecked()};
+          callback->Call(1, argv, async_resource);
+          callbackFired = true;
+          break;
+        }
+
+        v8::Local<v8::Array> properties = Nan::GetPropertyNames(nodeObj).ToLocalChecked();
+        for (unsigned int propIndex = 0; propIndex < properties->Length();
+             ++propIndex) {
+          v8::Local<v8::String> propName =
+              Nan::To<v8::String>(Nan::Get(properties, propIndex).ToLocalChecked()).ToLocalChecked();
+          v8::Local<v8::Value> nodeToQueue = Nan::Get(nodeObj, propName).ToLocalChecked();
+          if (!nodeToQueue->IsUndefined()) {
+            workerArguments.push(nodeToQueue);
+          }
+        }
+      }
+
+      if (!callbackFired) {
+        v8::Local<v8::Object> err =
+            Nan::To<v8::Object>(Nan::Error("Method clone has thrown an error.")).ToLocalChecked();
+        Nan::Set(err, Nan::New("errno").ToLocalChecked(),
+                 Nan::New(baton->error_code));
+        Nan::Set(err, Nan::New("errorFunction").ToLocalChecked(),
+                 Nan::New("Clone.clone").ToLocalChecked());
+        v8::Local<v8::Value> argv[1] = {err};
+        callback->Call(1, argv, async_resource);
+      }
+    } else {
+      callback->Call(0, NULL, async_resource);
+    }
+  }
+
+  delete baton;
+}
+
+     
