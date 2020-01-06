@@ -13,7 +13,12 @@ export async function run(): Promise<void> {
       allowChecksums
     )
     if (invalidWrapperJars.length > 0) {
-      core.setFailed(`Invalid wrapper jars ${invalidWrapperJars}`)
+      const list = invalidWrapperJars.map(
+        invalid => `${invalid.checksum} ${invalid.path}`
+      )
+      core.setFailed(
+        `Found unknown Gradle Wrapper JAR files\n${list.join('\n- ')}`
+      )
     }
   } catch (error) {
     core.setFailed(error.message)
