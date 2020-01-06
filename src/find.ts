@@ -1,27 +1,25 @@
-import {Repository, Commit, Tree, TreeEntry} from 'nodegit'
+import * as util from 'util'
+import * as path from 'path'
+import * as fs from 'fs'
 
-export async function findWrapperJars(gitRepoPath: string): Promise<string[]> {
-  const repo: Repository = await Repository.open(gitRepoPath)
-  const commit: Commit = await repo.getHeadCommit()
-  const tree: Tree = await commit.getTree()
-  const walker = tree.walk()
+const readdir = util.promisify(fs.readdir)
 
-  const prom: Promise<string[]> = new Promise((resolve, reject) => {
-    const wrapperJars: string[] = []
+export async function findWrapperJars(baseDir: string): Promise<string[]> {
+  const files = await recursivelyListFiles(baseDir)
+  return files
+    .filter(file => file.endsWith('gradle-wrapper.jar'))
+    .map(wrapperJar => path.relative(baseDir, wrapperJar))
+}
 
-    walker.on('entry', (entry: TreeEntry) => {
-      const path = entry.path()
-      if (path.endsWith('gradle-wrapper.jar')) {
-        wrapperJars.push(path)
-      }
+async function recursivelyListFiles(baseDir: string): Promise<string[]> {
+  const childrenNames = await readdir(baseDir)
+  const childrenPaths = await Promise.all(
+    childrenNames.map(async childName => {
+      const childPath = path.resolve(baseDir, childName)
+      return fs.lstatSync(childPath).isDirectory()
+        ? recursivelyListFiles(childPath)
+        : new Promise(resolve => resolve([childPath]))
     })
-    walker.on('error', error => {
-      reject(error)
-    })
-    walker.on('end', () => {
-      resolve(wrapperJars)
-    })
-  })
-  walker.start()
-  return prom
+  )
+  return Array.prototype.concat(...childrenPaths)
 }
