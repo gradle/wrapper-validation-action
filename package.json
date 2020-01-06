@@ -26,8 +26,6 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.0",
-    "@types/nodegit": "^0.26.0",
-    "nodegit": "^0.26.3",
     "typed-rest-client": "^1.7.1"
   },
   "devDependencies": {
