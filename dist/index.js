@@ -341,7 +341,8 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const allowSnapshots = core.getInput('allow-snapshots') === 'true';
-            const invalidWrapperJars = yield validate.findInvalidWrapperJars(path.resolve('.'), allowSnapshots);
+            const allowChecksums = core.getInput('allow-checksums').split(',');
+            const invalidWrapperJars = yield validate.findInvalidWrapperJars(path.resolve('.'), allowSnapshots, allowChecksums);
             if (invalidWrapperJars.length > 0) {
                 core.setFailed(`Invalid wrapper jars ${invalidWrapperJars}`);
             }
@@ -942,11 +943,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const find = __importStar(__webpack_require__(625));
 const checksums = __importStar(__webpack_require__(762));
 const hash = __importStar(__webpack_require__(652));
-function findInvalidWrapperJars(gitRepoRoot, allowSnapshots) {
+function findInvalidWrapperJars(gitRepoRoot, allowSnapshots, allowChecksums) {
     return __awaiter(this, void 0, void 0, function* () {
         const wrapperJars = yield find.findWrapperJars(gitRepoRoot);
         if (wrapperJars.length > 0) {
             const validChecksums = yield checksums.fetchValidChecksums(allowSnapshots);
+            validChecksums.push(...allowChecksums);
             const invalidWrapperJars = [];
             for (const wrapperJar of wrapperJars) {
                 const sha = yield hash.sha256File(wrapperJar);

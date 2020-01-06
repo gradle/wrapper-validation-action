@@ -4,7 +4,8 @@ import * as validate from '../src/validate'
 test('validates wrapper jars', async () => {
   const invalidWrapperJars = await validate.findInvalidWrapperJars(
     path.resolve('.'),
-    false
+    false,
+    []
   )
   expect(invalidWrapperJars.length).toBe(1)
   expect(invalidWrapperJars[0]).toEqual(

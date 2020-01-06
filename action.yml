@@ -6,6 +6,10 @@ inputs:
     description: 'Allow snapshot Gradle versions'
     required: false
     default: 'false'
+  allow-checksums:
+    description: 'Allow arbitrary checksums, comma separated'
+    required: false
+    default: ''
 runs:
   using: 'node12'
   main: 'dist/index.js'
