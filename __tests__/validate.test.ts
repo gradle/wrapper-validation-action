@@ -2,7 +2,7 @@ import * as path from 'path'
 import * as validate from '../src/validate'
 
 test('validates wrapper jars', async () => {
-  let invalidWrapperJars = await validate.findInvalidWrapperJars(
+  const invalidWrapperJars = await validate.findInvalidWrapperJars(
     path.resolve('.'),
     false
   )

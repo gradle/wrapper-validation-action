@@ -19546,10 +19546,16 @@ function sha256File(path) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             const hash = crypto.createHash('sha256');
-            fs.createReadStream(path)
-                .on('data', data => hash.update(data))
-                .on('end', () => resolve(hash.digest('hex')))
-                .on('error', error => reject(error));
+            const stream = fs.createReadStream(path);
+            stream.on('data', data => hash.update(data));
+            stream.on('end', () => {
+                stream.destroy();
+                resolve(hash.digest('hex'));
+            });
+            stream.on('error', error => {
+                stream.destroy();
+                reject(error);
+            });
         });
     });
 }

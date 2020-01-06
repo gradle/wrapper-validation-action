@@ -2,7 +2,7 @@ import * as path from 'path'
 import * as hash from '../src/hash'
 
 test('can sha256 files', async () => {
-  let sha = await hash.sha256File(
+  const sha = await hash.sha256File(
     path.resolve('__tests__/data/invalid/gradle-wrapper.jar')
   )
   expect(sha).toEqual(
