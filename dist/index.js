@@ -344,7 +344,8 @@ function run() {
             const allowChecksums = core.getInput('allow-checksums').split(',');
             const invalidWrapperJars = yield validate.findInvalidWrapperJars(path.resolve('.'), allowSnapshots, allowChecksums);
             if (invalidWrapperJars.length > 0) {
-                core.setFailed(`Invalid wrapper jars ${invalidWrapperJars}`);
+                const list = invalidWrapperJars.map(invalid => `${invalid.checksum} ${invalid.path}`);
+                core.setFailed(`Found unknown Gradle Wrapper JAR files\n${list.join('\n- ')}`);
             }
         }
         catch (error) {
@@ -953,7 +954,7 @@ function findInvalidWrapperJars(gitRepoRoot, allowSnapshots, allowChecksums) {
             for (const wrapperJar of wrapperJars) {
                 const sha = yield hash.sha256File(wrapperJar);
                 if (!validChecksums.includes(sha)) {
-                    invalidWrapperJars.push(wrapperJar);
+                    invalidWrapperJars.push(new InvalidWrapperJar(wrapperJar, sha));
                 }
             }
             return invalidWrapperJars;
@@ -962,6 +963,13 @@ function findInvalidWrapperJars(gitRepoRoot, allowSnapshots, allowChecksums) {
     });
 }
 exports.findInvalidWrapperJars = findInvalidWrapperJars;
+class InvalidWrapperJar {
+    constructor(path, checksum) {
+        this.path = path;
+        this.checksum = checksum;
+    }
+}
+exports.InvalidWrapperJar = InvalidWrapperJar;
 
 
 /***/ }),
