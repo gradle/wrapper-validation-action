@@ -19,7 +19,7 @@ We assume that most maintainers do not consider the security implications of acc
 There is a certain amount of blind trust open source maintainers have.
 Further compounding the issue is that maintainers are most often greeted in these PRs with a diff to the `gradle-wrapper.jar` that looks like this.
 
-![Screen Shot 2020-01-07 at 12 26 07 PM](https://user-images.githubusercontent.com/1323708/71915219-477d7780-3149-11ea-9254-90c80dbffb0a.png)
+![Image of a GitHub Diff of Gradle Wrapper displaying text 'Binary file not shown.'](https://user-images.githubusercontent.com/1323708/71915219-477d7780-3149-11ea-9254-90c80dbffb0a.png)
 
 A fairly simple social engineering supply chain attack against open source would be contribute a helpful “Updated to Gradle xxx” PR that contains malicious code hidden inside this binary JAR.
 A malicious `gradle-wrapper.jar` could execute, download, or install arbitrary code while otherwise behaving like a completely normal `gradle-wrapper.jar`.
