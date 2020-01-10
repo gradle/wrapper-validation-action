@@ -1,8 +1,8 @@
 <p align="center">
-  <a href="https://github.com/eskatos/gradle-wrapper-check/actions"><img alt="gradle-wrapper-check status" src="https://github.com/eskatos/gradle-wrapper-check/workflows/build-test/badge.svg"></a>
+  <a href="https://github.com/gradle/wrapper-validation-action/actions"><img alt="gradle/wrapper-validation-action status" src="https://github.com/gradle/wrapper-validation-action/workflows/build-test/badge.svg"></a>
 </p>
 
-# Validates Gradle Wrapper JARs
+# Gradle Wrapper Validation Action
 
 This action validates the checksums of [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) JAR files present in the source tree and fails if unknown Gradle Wrapper JAR files are found.
 
@@ -39,7 +39,23 @@ If any are found that do not match the SHA-256 checksums of our official release
 Simply add this action to your workflow **after** having checked out your source tree and **before** running any Gradle build:  
 
 ```yaml
-uses: eskatos/gradle-wrapper-check@releases/v1
+uses: gradle/wrapper-validation-action@releases/v1
+```
+
+Here's a sample complete workflow you can add to your repositories:
+
+**`.github/workflows/gradle-wrapper-validation.yml`**
+```yaml
+name: "Validate Gradle Wrapper"
+on: [push, pull_request]
+
+jobs:
+  validation:
+    name: "Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: eskatos/gradle-wrapper-check@releases/v1
 ```
 
 ## Reporting Failures
