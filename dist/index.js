@@ -340,9 +340,10 @@ const validate = __importStar(__webpack_require__(474));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const minWrapperCount = +core.getInput('min-wrapper-count');
             const allowSnapshots = core.getInput('allow-snapshots') === 'true';
             const allowChecksums = core.getInput('allow-checksums').split(',');
-            const invalidWrapperJars = yield validate.findInvalidWrapperJars(path.resolve('.'), allowSnapshots, allowChecksums);
+            const invalidWrapperJars = yield validate.findInvalidWrapperJars(path.resolve('.'), minWrapperCount, allowSnapshots, allowChecksums);
             if (invalidWrapperJars.length > 0) {
                 const list = invalidWrapperJars.map(invalid => `${invalid.checksum} ${invalid.path}`);
                 core.setFailed(`Found unknown Gradle Wrapper JAR files\n${list.join('\n- ')}`);
@@ -944,9 +945,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const find = __importStar(__webpack_require__(625));
 const checksums = __importStar(__webpack_require__(762));
 const hash = __importStar(__webpack_require__(652));
-function findInvalidWrapperJars(gitRepoRoot, allowSnapshots, allowChecksums) {
+function findInvalidWrapperJars(gitRepoRoot, minWrapperCount, allowSnapshots, allowChecksums) {
     return __awaiter(this, void 0, void 0, function* () {
         const wrapperJars = yield find.findWrapperJars(gitRepoRoot);
+        if (wrapperJars.length < minWrapperCount) {
+            throw new Error(`Expected at least ${minWrapperCount} but got only ${wrapperJars.length}`);
+        }
         if (wrapperJars.length > 0) {
             const validChecksums = yield checksums.fetchValidChecksums(allowSnapshots);
             validChecksums.push(...allowChecksums);

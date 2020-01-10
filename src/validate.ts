@@ -4,10 +4,20 @@ import * as hash from './hash'
 
 export async function findInvalidWrapperJars(
   gitRepoRoot: string,
+  minWrapperCount: number,
   allowSnapshots: boolean,
   allowChecksums: string[]
 ): Promise<InvalidWrapperJar[]> {
   const wrapperJars = await find.findWrapperJars(gitRepoRoot)
+  // eslint-disable-next-line no-console
+  console.log(
+    `Expected at least ${minWrapperCount} but got only ${wrapperJars.length}`
+  )
+  if (wrapperJars.length < minWrapperCount) {
+    throw new Error(
+      `Expected at least ${minWrapperCount} but got only ${wrapperJars.length}`
+    )
+  }
   if (wrapperJars.length > 0) {
     const validChecksums = await checksums.fetchValidChecksums(allowSnapshots)
     validChecksums.push(...allowChecksums)
