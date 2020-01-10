@@ -39,7 +39,7 @@ If any are found that do not match the SHA-256 checksums of our official release
 Simply add this action to your workflow **after** having checked out your source tree and **before** running any Gradle build:  
 
 ```yaml
-uses: gradle/wrapper-validation-action@releases/v1
+uses: gradle/wrapper-validation-action@v1
 ```
 
 Here's a sample complete workflow you can add to your repositories:
@@ -55,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: gradle/wrapper-validation-action@releases/v1
+      - uses: gradle/wrapper-validation-action@v1
 ```
 
 ## Reporting Failures
