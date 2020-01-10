@@ -1,7 +1,12 @@
 name: 'Gradle Wrapper Validation'
 description: 'Validates Gradle Wrapper JAR Files'
 author: 'Gradle'
+
 inputs:
+  min-wrapper-count:
+    description: 'Minimum expected wrapper JAR files'
+    required: false
+    default: '1'
   allow-snapshots:
     description: 'Allow snapshot Gradle versions'
     required: false
@@ -10,6 +15,11 @@ inputs:
     description: 'Allow arbitrary checksums, comma separated'
     required: false
     default: ''
+
 runs:
   using: 'node12'
   main: 'dist/index.js'
+
+branding:
+  icon: 'shield'
+  color: gray-dark

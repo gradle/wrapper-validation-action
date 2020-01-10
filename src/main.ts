@@ -5,10 +5,12 @@ import * as validate from './validate'
 
 export async function run(): Promise<void> {
   try {
+    const minWrapperCount = +core.getInput('min-wrapper-count')
     const allowSnapshots = core.getInput('allow-snapshots') === 'true'
     const allowChecksums = core.getInput('allow-checksums').split(',')
     const invalidWrapperJars = await validate.findInvalidWrapperJars(
       path.resolve('.'),
+      minWrapperCount,
       allowSnapshots,
       allowChecksums
     )
