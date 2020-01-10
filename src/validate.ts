@@ -9,13 +9,9 @@ export async function findInvalidWrapperJars(
   allowChecksums: string[]
 ): Promise<InvalidWrapperJar[]> {
   const wrapperJars = await find.findWrapperJars(gitRepoRoot)
-  // eslint-disable-next-line no-console
-  console.log(
-    `Expected at least ${minWrapperCount} but got only ${wrapperJars.length}`
-  )
   if (wrapperJars.length < minWrapperCount) {
     throw new Error(
-      `Expected at least ${minWrapperCount} but got only ${wrapperJars.length}`
+      `Expected to find at least ${minWrapperCount} Gradle Wrapper JARs but got only ${wrapperJars.length}`
     )
   }
   if (wrapperJars.length > 0) {

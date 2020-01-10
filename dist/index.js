@@ -949,7 +949,7 @@ function findInvalidWrapperJars(gitRepoRoot, minWrapperCount, allowSnapshots, al
     return __awaiter(this, void 0, void 0, function* () {
         const wrapperJars = yield find.findWrapperJars(gitRepoRoot);
         if (wrapperJars.length < minWrapperCount) {
-            throw new Error(`Expected at least ${minWrapperCount} but got only ${wrapperJars.length}`);
+            throw new Error(`Expected to find at least ${minWrapperCount} Gradle Wrapper JARs but got only ${wrapperJars.length}`);
         }
         if (wrapperJars.length > 0) {
             const validChecksums = yield checksums.fetchValidChecksums(allowSnapshots);

@@ -18,10 +18,9 @@ test('validates wrapper jars', async () => {
 })
 
 test('fails if not enough wrapper jars are found', async () => {
-  await expect(validate.findInvalidWrapperJars(
-    path.resolve('.'),
-    3,
-    false,
-    []
-  )).rejects.toThrowError('Expected at least 3 but got only 2')
+  await expect(
+    validate.findInvalidWrapperJars(path.resolve('.'), 3, false, [])
+  ).rejects.toThrowError(
+    'Expected to find at least 3 Gradle Wrapper JARs but got only 2'
+  )
 })
