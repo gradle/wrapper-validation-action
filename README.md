@@ -36,7 +36,7 @@ If any are found that do not match the SHA-256 checksums of our official release
 
 ## Usage
 
-Simply add this action to your workflow **before** running any Gradle build:  
+Simply add this action to your workflow **after** having checked out your source tree and **before** running any Gradle build:  
 
 ```yaml
 uses: eskatos/gradle-wrapper-check@releases/v1
