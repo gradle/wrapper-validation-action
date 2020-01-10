@@ -1,5 +1,5 @@
-name: 'Gradle Wrapper Check'
-description: 'Check Gradle Wrapper Files'
+name: 'Gradle Wrapper Validation'
+description: 'Validates Gradle Wrapper JAR Files'
 author: 'Gradle'
 inputs:
   allow-snapshots:
