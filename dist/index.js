@@ -340,13 +340,12 @@ const validate = __importStar(__webpack_require__(474));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const minWrapperCount = +core.getInput('min-wrapper-count');
-            const allowSnapshots = core.getInput('allow-snapshots') === 'true';
-            const allowChecksums = core.getInput('allow-checksums').split(',');
-            const invalidWrapperJars = yield validate.findInvalidWrapperJars(path.resolve('.'), minWrapperCount, allowSnapshots, allowChecksums);
-            if (invalidWrapperJars.length > 0) {
-                const list = invalidWrapperJars.map(invalid => `${invalid.checksum} ${invalid.path}`);
-                core.setFailed(`Found unknown Gradle Wrapper JAR files\n${list.join('\n- ')}`);
+            const result = yield validate.findInvalidWrapperJars(path.resolve('.'), +core.getInput('min-wrapper-count'), core.getInput('allow-snapshots') === 'true', core.getInput('allow-checksums').split(','));
+            if (result.isValid()) {
+                core.info(result.toDisplayString());
+            }
+            else {
+                core.setFailed(result.toDisplayString());
             }
         }
         catch (error) {
@@ -948,32 +947,68 @@ const hash = __importStar(__webpack_require__(652));
 function findInvalidWrapperJars(gitRepoRoot, minWrapperCount, allowSnapshots, allowChecksums) {
     return __awaiter(this, void 0, void 0, function* () {
         const wrapperJars = yield find.findWrapperJars(gitRepoRoot);
+        const result = new ValidationResult([], []);
         if (wrapperJars.length < minWrapperCount) {
-            throw new Error(`Expected to find at least ${minWrapperCount} Gradle Wrapper JARs but got only ${wrapperJars.length}`);
+            result.errors.push(`Expected to find at least ${minWrapperCount} Gradle Wrapper JARs but got only ${wrapperJars.length}`);
         }
         if (wrapperJars.length > 0) {
             const validChecksums = yield checksums.fetchValidChecksums(allowSnapshots);
             validChecksums.push(...allowChecksums);
-            const invalidWrapperJars = [];
             for (const wrapperJar of wrapperJars) {
                 const sha = yield hash.sha256File(wrapperJar);
                 if (!validChecksums.includes(sha)) {
-                    invalidWrapperJars.push(new InvalidWrapperJar(wrapperJar, sha));
+                    result.invalid.push(new WrapperJar(wrapperJar, sha));
+                }
+                else {
+                    result.valid.push(new WrapperJar(wrapperJar, sha));
                 }
             }
-            return invalidWrapperJars;
         }
-        return [];
+        return result;
     });
 }
 exports.findInvalidWrapperJars = findInvalidWrapperJars;
-class InvalidWrapperJar {
+class ValidationResult {
+    constructor(valid, invalid) {
+        this.errors = [];
+        this.valid = valid;
+        this.invalid = invalid;
+    }
+    isValid() {
+        return this.invalid.length === 0 && this.errors.length === 0;
+    }
+    toDisplayString() {
+        let displayString = '';
+        if (this.invalid.length > 0) {
+            displayString += `✗ Found unknown Gradle Wrapper JAR files\n${ValidationResult.toDisplayList(this.invalid)}`;
+        }
+        if (this.errors.length > 0) {
+            if (displayString.length > 0)
+                displayString += '\n';
+            displayString += `✗ Other validation errors\n  ${this.errors.join(`\n  `)}`;
+        }
+        if (this.valid.length > 0) {
+            if (displayString.length > 0)
+                displayString += '\n';
+            displayString += `✓ Found known Gradle Wrapper JAR files\n${ValidationResult.toDisplayList(this.valid)}`;
+        }
+        return displayString;
+    }
+    static toDisplayList(wrapperJars) {
+        return `  ${wrapperJars.map(wj => wj.toDisplayString()).join(`\n  `)}`;
+    }
+}
+exports.ValidationResult = ValidationResult;
+class WrapperJar {
     constructor(path, checksum) {
         this.path = path;
         this.checksum = checksum;
     }
+    toDisplayString() {
+        return `${this.checksum} ${this.path}`;
+    }
 }
-exports.InvalidWrapperJar = InvalidWrapperJar;
+exports.WrapperJar = WrapperJar;
 
 
 /***/ }),
@@ -1030,7 +1065,8 @@ function findWrapperJars(baseDir) {
         const files = yield recursivelyListFiles(baseDir);
         return files
             .filter(file => file.endsWith('gradle-wrapper.jar'))
-            .map(wrapperJar => path.relative(baseDir, wrapperJar));
+            .map(wrapperJar => path.relative(baseDir, wrapperJar))
+            .sort((a, b) => a.localeCompare(b));
     });
 }
 exports.findWrapperJars = findWrapperJars;
