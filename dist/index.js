@@ -980,17 +980,17 @@ class ValidationResult {
     toDisplayString() {
         let displayString = '';
         if (this.invalid.length > 0) {
-            displayString += `✗ Found unknown Gradle Wrapper JAR files\n${ValidationResult.toDisplayList(this.invalid)}`;
+            displayString += `✗ Found unknown Gradle Wrapper JAR files:\n${ValidationResult.toDisplayList(this.invalid)}`;
         }
         if (this.errors.length > 0) {
             if (displayString.length > 0)
                 displayString += '\n';
-            displayString += `✗ Other validation errors\n  ${this.errors.join(`\n  `)}`;
+            displayString += `✗ Other validation errors:\n  ${this.errors.join(`\n  `)}`;
         }
         if (this.valid.length > 0) {
             if (displayString.length > 0)
                 displayString += '\n';
-            displayString += `✓ Found known Gradle Wrapper JAR files\n${ValidationResult.toDisplayList(this.valid)}`;
+            displayString += `✓ Found known Gradle Wrapper JAR files:\n${ValidationResult.toDisplayList(this.valid)}`;
         }
         return displayString;
     }

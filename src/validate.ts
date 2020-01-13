@@ -47,19 +47,19 @@ export class ValidationResult {
   toDisplayString(): string {
     let displayString = ''
     if (this.invalid.length > 0) {
-      displayString += `✗ Found unknown Gradle Wrapper JAR files\n${ValidationResult.toDisplayList(
+      displayString += `✗ Found unknown Gradle Wrapper JAR files:\n${ValidationResult.toDisplayList(
         this.invalid
       )}`
     }
     if (this.errors.length > 0) {
       if (displayString.length > 0) displayString += '\n'
-      displayString += `✗ Other validation errors\n  ${this.errors.join(
+      displayString += `✗ Other validation errors:\n  ${this.errors.join(
         `\n  `
       )}`
     }
     if (this.valid.length > 0) {
       if (displayString.length > 0) displayString += '\n'
-      displayString += `✓ Found known Gradle Wrapper JAR files\n${ValidationResult.toDisplayList(
+      displayString += `✓ Found known Gradle Wrapper JAR files:\n${ValidationResult.toDisplayList(
         this.valid
       )}`
     }
