@@ -5,22 +5,16 @@ import * as validate from './validate'
 
 export async function run(): Promise<void> {
   try {
-    const minWrapperCount = +core.getInput('min-wrapper-count')
-    const allowSnapshots = core.getInput('allow-snapshots') === 'true'
-    const allowChecksums = core.getInput('allow-checksums').split(',')
-    const invalidWrapperJars = await validate.findInvalidWrapperJars(
+    const result = await validate.findInvalidWrapperJars(
       path.resolve('.'),
-      minWrapperCount,
-      allowSnapshots,
-      allowChecksums
+      +core.getInput('min-wrapper-count'),
+      core.getInput('allow-snapshots') === 'true',
+      core.getInput('allow-checksums').split(',')
     )
-    if (invalidWrapperJars.length > 0) {
-      const list = invalidWrapperJars.map(
-        invalid => `${invalid.checksum} ${invalid.path}`
-      )
-      core.setFailed(
-        `Found unknown Gradle Wrapper JAR files\n${list.join('\n- ')}`
-      )
+    if (result.isValid()) {
+      core.info(result.toDisplayString())
+    } else {
+      core.setFailed(result.toDisplayString())
     }
   } catch (error) {
     core.setFailed(error.message)
