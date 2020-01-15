@@ -66,3 +66,8 @@ we highly recommend that you reach out to us at [security@gradle.com](mailto:sec
 If you're curious and want to explore what the differences are between the `gradle-wrapper.jar` in your possession
 and one of our valid release, you can compare them using this online utility: [DiffScope](https://try.diffoscope.org/).
 Regardless of what you find, we still kindly request that you reach out to us and let us know about any issues you encountered.
+
+## Resources
+
+To learn more about verifying the Gradle Wrapper JAR locally, see our
+[guide on the topic](https://docs.gradle.org/current/userguide/gradle_wrapper.html#wrapper_checksum_verification).
