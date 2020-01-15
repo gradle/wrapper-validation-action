@@ -10,6 +10,7 @@ export async function findWrapperJars(baseDir: string): Promise<string[]> {
   return files
     .filter(file => unhomoglyph(file).endsWith('gradle-wrapper.jar'))
     .map(wrapperJar => path.relative(baseDir, wrapperJar))
+    .sort((a, b) => a.localeCompare(b))
 }
 
 async function recursivelyListFiles(baseDir: string): Promise<string[]> {
