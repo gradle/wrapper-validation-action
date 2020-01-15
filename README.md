@@ -34,6 +34,12 @@ verify that any and all `gradle-wrapper.jar` files in the repository match the S
 
 If any are found that do not match the SHA-256 checksums of our official releases, the action will fail.
 
+Additionally, the action will find and SHA-256 hash all
+[homoglyph](https://en.wikipedia.org/wiki/Homoglyph)
+variants of files named `gradle-wrapper.jar`,
+for example a file named `gradlе-wrapper.jar` (which uses a Cyrillic `е` instead of `e`).
+The goal is to prevent homoglyph attacks which may be very difficult to spot in a GitHub diff.
+
 ## Usage
 
 Simply add this action to your workflow **after** having checked out your source tree and **before** running any Gradle build:  
