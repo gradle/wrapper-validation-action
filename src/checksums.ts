@@ -1,6 +1,6 @@
 import * as httpm from 'typed-rest-client/HttpClient'
 
-const httpc = new httpm.HttpClient('eskatos/gradle-wrapper-check')
+const httpc = new httpm.HttpClient('gradle/wrapper-validation-action')
 
 export async function fetchValidChecksums(
   allowSnapshots: boolean

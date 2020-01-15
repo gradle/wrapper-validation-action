@@ -1645,7 +1645,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const httpm = __importStar(__webpack_require__(874));
-const httpc = new httpm.HttpClient('eskatos/gradle-wrapper-check');
+const httpc = new httpm.HttpClient('gradle/wrapper-validation-action');
 function fetchValidChecksums(allowSnapshots) {
     return __awaiter(this, void 0, void 0, function* () {
         const all = yield httpGetJsonArray('https://services.gradle.org/versions/all');
