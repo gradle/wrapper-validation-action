@@ -1,13 +1,14 @@
 import * as util from 'util'
 import * as path from 'path'
 import * as fs from 'fs'
+import unhomoglyph from 'unhomoglyph'
 
 const readdir = util.promisify(fs.readdir)
 
 export async function findWrapperJars(baseDir: string): Promise<string[]> {
   const files = await recursivelyListFiles(baseDir)
   return files
-    .filter(file => file.endsWith('gradle-wrapper.jar'))
+    .filter(file => unhomoglyph(file).endsWith('gradle-wrapper.jar'))
     .map(wrapperJar => path.relative(baseDir, wrapperJar))
     .sort((a, b) => a.localeCompare(b))
 }
