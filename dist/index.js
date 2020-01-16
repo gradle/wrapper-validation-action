@@ -345,7 +345,7 @@ function run() {
                 core.info(result.toDisplayString());
             }
             else {
-                core.setFailed(result.toDisplayString());
+                core.setFailed(`Gradle Wrapper Validation Failed!\n  See https://github.com/gradle/wrapper-validation-action#reporting-failures\n${result.toDisplayString()}`);
             }
         }
         catch (error) {
