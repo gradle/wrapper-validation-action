@@ -15,7 +15,7 @@ Searching across GitHub you can find many pull requests (PRs) with helpful title
 Many of these PRs are contributed by individuals outside of the organization maintaining the project.
 
 Many maintainers are incredibly grateful for these kinds of contributions as it takes an item off of their backlog.
-We assume that most maintainers do not consider the security implications of accepting the Gradle Wrapper binary from an external contributors.
+We assume that most maintainers do not consider the security implications of accepting the Gradle Wrapper binary from external contributors.
 There is a certain amount of blind trust open source maintainers have.
 Further compounding the issue is that maintainers are most often greeted in these PRs with a diff to the `gradle-wrapper.jar` that looks like this.
 
@@ -42,7 +42,7 @@ The goal is to prevent homoglyph attacks which may be very difficult to spot in 
 
 ## Usage
 
-Simply add this action to your workflow **after** having checked out your source tree and **before** running any Gradle build:  
+Simply add this action to your workflow **after** having checked out your source tree and **before** running any Gradle build:
 
 ```yaml
 uses: gradle/wrapper-validation-action@v1
