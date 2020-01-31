@@ -24,8 +24,6 @@ Further compounding the issue is that maintainers are most often greeted in thes
 A fairly simple social engineering supply chain attack against open source would be contribute a helpful “Updated to Gradle xxx” PR that contains malicious code hidden inside this binary JAR.
 A malicious `gradle-wrapper.jar` could execute, download, or install arbitrary code while otherwise behaving like a completely normal `gradle-wrapper.jar`.
 
-This problem is unique to open source and doesn’t normally impact companies with closed source and pre-vetted employees.
-
 ## Solution
 
 We have created a simple GitHub Action that can be applied to any GitHub repository.
