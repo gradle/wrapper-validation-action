@@ -40,11 +40,15 @@ The goal is to prevent homoglyph attacks which may be very difficult to spot in 
 
 ## Usage
 
+### Add to an existing Workflow
+
 Simply add this action to your workflow **after** having checked out your source tree and **before** running any Gradle build:
 
 ```yaml
 uses: gradle/wrapper-validation-action@v1
 ```
+
+### Add a new dedicated Workflow
 
 Here's a sample complete workflow you can add to your repositories:
 
@@ -61,6 +65,26 @@ jobs:
       - uses: actions/checkout@v2
       - uses: gradle/wrapper-validation-action@v1
 ```
+
+## Contributing to an external GitHub Repository
+
+Since [GitHub Actions](https://github.com/features/actions)
+are completely free for open source projects and are automatically enabled on almost all projects,
+adding this check to a project's build is as simple as contributing a PR.
+Enabling the check requires no overhead on behalf of the project maintainer beyond merging the action.
+
+You can add this action to your favorite Gradle based project without checking out their source locally via the
+GitHub Web UI thanks to the 'Create new file' button.
+
+![GitHub 'Create new file' Button bar picture](https://user-images.githubusercontent.com/1323708/73676469-6c023c00-4682-11ea-8c0a-5a1e2d29b17f.png)
+
+Simply add a new file named `.github/workflows/gradle-wrapper-validation.yml` with the contents mentioned above.
+
+We recommend the message commit contents of:
+ - Title: `Official Gradle Wrapper Validation Action`
+ - Body (at minimum): `See: https://github.com/gradle/wrapper-validation-action`
+
+From there, you can easily follow the rest of the prompts to create a Pull Request against the project.
 
 ## Reporting Failures
 
