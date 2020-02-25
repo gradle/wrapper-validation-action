@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://github.com/gradle/wrapper-validation-action/actions"><img alt="gradle/wrapper-validation-action status" src="https://github.com/gradle/wrapper-validation-action/workflows/build-test/badge.svg"></a>
+  <a href="https://github.com/gradle/wrapper-validation-action/actions"><img alt="gradle/wrapper-validation-action status" src="https://github.com/gradle/wrapper-validation-action/workflows/ci/badge.svg"></a>
 </p>
 
 # Gradle Wrapper Validation Action
