@@ -37,6 +37,7 @@ Additionally, the action will find and SHA-256 hash all
 variants of files named `gradle-wrapper.jar`,
 for example a file named `gradlе-wrapper.jar` (which uses a Cyrillic `е` instead of `e`).
 The goal is to prevent homoglyph attacks which may be very difficult to spot in a GitHub diff.
+We created an example [Homoglyph attack PR here](https://github.com/JLLeitschuh/playframework/pull/1/files).
 
 ## Usage
 
