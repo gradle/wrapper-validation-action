@@ -25,9 +25,9 @@
   "author": "YourNameOrOrganization",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.0",
-    "typed-rest-client": "^1.7.1",
-    "unhomoglyph": "^1.0.3"
+    "@actions/core": "^1.2.3",
+    "typed-rest-client": "^1.7.3",
+    "unhomoglyph": "^1.0.5"
   },
   "devDependencies": {
     "@types/jest": "^25.2.1",
