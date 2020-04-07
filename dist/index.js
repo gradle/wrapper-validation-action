@@ -88,6 +88,7 @@ function httpsOverHttp(options) {
   var agent = new TunnelingAgent(options);
   agent.request = http.request;
   agent.createSocket = createSecureSocket;
+  agent.defaultPort = 443;
   return agent;
 }
 
@@ -101,6 +102,7 @@ function httpsOverHttps(options) {
   var agent = new TunnelingAgent(options);
   agent.request = https.request;
   agent.createSocket = createSecureSocket;
+  agent.defaultPort = 443;
   return agent;
 }
 
@@ -169,8 +171,14 @@ TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
   var connectOptions = mergeOptions({}, self.proxyOptions, {
     method: 'CONNECT',
     path: options.host + ':' + options.port,
-    agent: false
+    agent: false,
+    headers: {
+      host: options.host + ':' + options.port
+    }
   });
+  if (options.localAddress) {
+    connectOptions.localAddress = options.localAddress;
+  }
   if (connectOptions.proxyAuth) {
     connectOptions.headers = connectOptions.headers || {};
     connectOptions.headers['Proxy-Authorization'] = 'Basic ' +
@@ -202,20 +210,29 @@ TunnelingAgent.prototype.createSocket = function createSocket(options, cb) {
     connectReq.removeAllListeners();
     socket.removeAllListeners();
 
-    if (res.statusCode === 200) {
-      assert.equal(head.length, 0);
-      debug('tunneling connection has established');
-      self.sockets[self.sockets.indexOf(placeholder)] = socket;
-      cb(socket);
-    } else {
+    if (res.statusCode !== 200) {
       debug('tunneling socket could not be established, statusCode=%d',
-            res.statusCode);
+        res.statusCode);
+      socket.destroy();
       var error = new Error('tunneling socket could not be established, ' +
-                            'statusCode=' + res.statusCode);
+        'statusCode=' + res.statusCode);
       error.code = 'ECONNRESET';
       options.request.emit('error', error);
       self.removeSocket(placeholder);
+      return;
     }
+    if (head.length > 0) {
+      debug('got illegal response body from proxy');
+      socket.destroy();
+      var error = new Error('got illegal response body from proxy');
+      error.code = 'ECONNRESET';
+      options.request.emit('error', error);
+      self.removeSocket(placeholder);
+      return;
+    }
+    debug('tunneling connection has established');
+    self.sockets[self.sockets.indexOf(placeholder)] = socket;
+    return cb(socket);
   }
 
   function onError(cause) {
@@ -429,6 +446,25 @@ var interpretNumericEntities = function (str) {
     });
 };
 
+var parseArrayValue = function (val, options) {
+    if (val && typeof val === 'string' && options.comma && val.indexOf(',') > -1) {
+        return val.split(',');
+    }
+
+    return val;
+};
+
+var maybeMap = function maybeMap(val, fn) {
+    if (isArray(val)) {
+        var mapped = [];
+        for (var i = 0; i < val.length; i += 1) {
+            mapped.push(fn(val[i]));
+        }
+        return mapped;
+    }
+    return fn(val);
+};
+
 // This is what browsers will submit when the ✓ character occurs in an
 // application/x-www-form-urlencoded body and the encoding of the page containing
 // the form is iso-8859-1, or when the submitted form has an accept-charset
@@ -477,15 +513,16 @@ var parseValues = function parseQueryStringValues(str, options) {
             val = options.strictNullHandling ? null : '';
         } else {
             key = options.decoder(part.slice(0, pos), defaults.decoder, charset, 'key');
-            val = options.decoder(part.slice(pos + 1), defaults.decoder, charset, 'value');
+            val = maybeMap(
+                parseArrayValue(part.slice(pos + 1), options),
+                function (encodedVal) {
+                    return options.decoder(encodedVal, defaults.decoder, charset, 'value');
+                }
+            );
         }
 
         if (val && options.interpretNumericEntities && charset === 'iso-8859-1') {
             val = interpretNumericEntities(val);
-        }
-
-        if (val && typeof val === 'string' && options.comma && val.indexOf(',') > -1) {
-            val = val.split(',');
         }
 
         if (part.indexOf('[]=') > -1) {
@@ -502,8 +539,8 @@ var parseValues = function parseQueryStringValues(str, options) {
     return obj;
 };
 
-var parseObject = function (chain, val, options) {
-    var leaf = val;
+var parseObject = function (chain, val, options, valuesParsed) {
+    var leaf = valuesParsed ? val : parseArrayValue(val, options);
 
     for (var i = chain.length - 1; i >= 0; --i) {
         var obj;
@@ -531,13 +568,13 @@ var parseObject = function (chain, val, options) {
             }
         }
 
-        leaf = obj;
+        leaf = obj; // eslint-disable-line no-param-reassign
     }
 
     return leaf;
 };
 
-var parseKeys = function parseQueryStringKeys(givenKey, val, options) {
+var parseKeys = function parseQueryStringKeys(givenKey, val, options, valuesParsed) {
     if (!givenKey) {
         return;
     }
@@ -588,7 +625,7 @@ var parseKeys = function parseQueryStringKeys(givenKey, val, options) {
         keys.push('[' + key.slice(segment.index) + ']');
     }
 
-    return parseObject(keys, val, options);
+    return parseObject(keys, val, options, valuesParsed);
 };
 
 var normalizeParseOptions = function normalizeParseOptions(opts) {
@@ -601,7 +638,7 @@ var normalizeParseOptions = function normalizeParseOptions(opts) {
     }
 
     if (typeof opts.charset !== 'undefined' && opts.charset !== 'utf-8' && opts.charset !== 'iso-8859-1') {
-        throw new Error('The charset option must be either utf-8, iso-8859-1, or undefined');
+        throw new TypeError('The charset option must be either utf-8, iso-8859-1, or undefined');
     }
     var charset = typeof opts.charset === 'undefined' ? defaults.charset : opts.charset;
 
@@ -640,7 +677,7 @@ module.exports = function (str, opts) {
     var keys = Object.keys(tempObj);
     for (var i = 0; i < keys.length; ++i) {
         var key = keys[i];
-        var newObj = parseKeys(key, tempObj[key], options);
+        var newObj = parseKeys(key, tempObj[key], options, typeof str === 'string');
         obj = utils.merge(obj, newObj, options);
     }
 
@@ -677,17 +714,24 @@ module.exports = require("crypto");
 
 "use strict";
 
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const os = __webpack_require__(87);
+const os = __importStar(__webpack_require__(87));
 /**
  * Commands
  *
  * Command Format:
- *   ##[name key=value;key=value]message
+ *   ::name key=value,key=value::message
  *
  * Examples:
- *   ##[warning]This is the user warning message
- *   ##[set-secret name=mypassword]definitelyNotAPassword!
+ *   ::warning::This is the message
+ *   ::set-env name=MY_VAR::some value
  */
 function issueCommand(command, properties, message) {
     const cmd = new Command(command, properties, message);
@@ -712,34 +756,39 @@ class Command {
         let cmdStr = CMD_STRING + this.command;
         if (this.properties && Object.keys(this.properties).length > 0) {
             cmdStr += ' ';
+            let first = true;
             for (const key in this.properties) {
                 if (this.properties.hasOwnProperty(key)) {
                     const val = this.properties[key];
                     if (val) {
-                        // safely append the val - avoid blowing up when attempting to
-                        // call .replace() if message is not a string for some reason
-                        cmdStr += `${key}=${escape(`${val || ''}`)},`;
+                        if (first) {
+                            first = false;
+                        }
+                        else {
+                            cmdStr += ',';
+                        }
+                        cmdStr += `${key}=${escapeProperty(val)}`;
                     }
                 }
             }
         }
-        cmdStr += CMD_STRING;
-        // safely append the message - avoid blowing up when attempting to
-        // call .replace() if message is not a string for some reason
-        const message = `${this.message || ''}`;
-        cmdStr += escapeData(message);
+        cmdStr += `${CMD_STRING}${escapeData(this.message)}`;
         return cmdStr;
     }
 }
 function escapeData(s) {
-    return s.replace(/\r/g, '%0D').replace(/\n/g, '%0A');
+    return (s || '')
+        .replace(/%/g, '%25')
+        .replace(/\r/g, '%0D')
+        .replace(/\n/g, '%0A');
 }
-function escape(s) {
-    return s
+function escapeProperty(s) {
+    return (s || '')
+        .replace(/%/g, '%25')
         .replace(/\r/g, '%0D')
         .replace(/\n/g, '%0A')
-        .replace(/]/g, '%5D')
-        .replace(/;/g, '%3B');
+        .replace(/:/g, '%3A')
+        .replace(/,/g, '%2C');
 }
 //# sourceMappingURL=command.js.map
 
@@ -759,10 +808,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const command_1 = __webpack_require__(431);
-const os = __webpack_require__(87);
-const path = __webpack_require__(622);
+const os = __importStar(__webpack_require__(87));
+const path = __importStar(__webpack_require__(622));
 /**
  * The code to exit an action
  */
@@ -848,6 +904,13 @@ exports.setFailed = setFailed;
 //-----------------------------------------------------------------------
 // Logging Commands
 //-----------------------------------------------------------------------
+/**
+ * Gets whether Actions Step Debug is on or not
+ */
+function isDebug() {
+    return process.env['RUNNER_DEBUG'] === '1';
+}
+exports.isDebug = isDebug;
 /**
  * Writes debug message to user log
  * @param message debug message
@@ -1565,9 +1628,10 @@ function obtainContentCharset(response) {
     // |__ matches would be ['charset=utf-8', 'utf-8', index: 18, input: 'application/json; charset=utf-8']
     // |_____ matches[1] would have the charset :tada: , in our example it's utf-8
     // However, if the matches Array was empty or no charset found, 'utf-8' would be returned by default.
+    const nodeSupportedEncodings = ['ascii', 'utf8', 'utf16le', 'ucs2', 'base64', 'binary', 'hex'];
     const contentType = response.message.headers['content-type'] || '';
     const matches = contentType.match(/charset=([^;,\r\n]+)/i);
-    return (matches && matches[1]) ? matches[1] : 'utf-8';
+    return (matches && matches[1] && nodeSupportedEncodings.indexOf(matches[1]) != -1) ? matches[1] : 'utf-8';
 }
 exports.obtainContentCharset = obtainContentCharset;
 
@@ -2048,7 +2112,9 @@ class HttpClientResponse {
                         const gunzippedBody = yield util.decompressGzippedContent(buffer, encodingCharset);
                         resolve(gunzippedBody);
                     }
-                    resolve(buffer.toString(encodingCharset));
+                    else {
+                        resolve(buffer.toString(encodingCharset));
+                    }
                 });
             }).on('error', function (err) {
                 reject(err);
@@ -2262,7 +2328,6 @@ class HttpClient {
      */
     requestRawWithCallback(info, data, onResult) {
         let socket;
-        let isDataString = typeof (data) === 'string';
         if (typeof (data) === 'string') {
             info.options.headers["Content-Length"] = Buffer.byteLength(data, 'utf8');
         }
@@ -2283,7 +2348,7 @@ class HttpClient {
         // If we ever get disconnected, we want the socket to timeout eventually
         req.setTimeout(this._socketTimeout || 3 * 60000, () => {
             if (socket) {
-                socket.end();
+                socket.destroy();
             }
             handleResult(new Error('Request timeout: ' + info.options.path), null);
         });
