@@ -5,9 +5,7 @@ const httpc = new httpm.HttpClient('gradle/wrapper-validation-action')
 export async function fetchValidChecksums(
   allowSnapshots: boolean
 ): Promise<string[]> {
-  const all: object[] = await httpGetJsonArray(
-    'https://services.gradle.org/versions/all'
-  )
+  const all = await httpGetJsonArray('https://services.gradle.org/versions/all')
   const withChecksum = all.filter(entry =>
     entry.hasOwnProperty('wrapperChecksumUrl')
   )
@@ -15,7 +13,7 @@ export async function fetchValidChecksums(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (entry: any) => allowSnapshots || !entry.snapshot
   )
-  const checksumUrls: string[] = allowed.map(
+  const checksumUrls = allowed.map(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (entry: any) => entry.wrapperChecksumUrl as string
   )
