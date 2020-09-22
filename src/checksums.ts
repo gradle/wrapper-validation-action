@@ -6,8 +6,11 @@ export async function fetchValidChecksums(
   allowSnapshots: boolean
 ): Promise<string[]> {
   const all = await httpGetJsonArray('https://services.gradle.org/versions/all')
-  const withChecksum = all.filter(entry =>
-    entry.hasOwnProperty('wrapperChecksumUrl')
+  const withChecksum = all.filter(
+    entry =>
+      typeof entry === 'object' &&
+      entry != null &&
+      entry.hasOwnProperty('wrapperChecksumUrl')
   )
   const allowed = withChecksum.filter(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,7 +26,7 @@ export async function fetchValidChecksums(
   return [...new Set(checksums)]
 }
 
-async function httpGetJsonArray(url: string): Promise<object[]> {
+async function httpGetJsonArray(url: string): Promise<unknown[]> {
   return JSON.parse(await httpGetText(url))
 }
 
