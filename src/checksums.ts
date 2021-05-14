@@ -1,6 +1,10 @@
 import * as httpm from 'typed-rest-client/HttpClient'
 
-const httpc = new httpm.HttpClient('gradle/wrapper-validation-action')
+const httpc = new httpm.HttpClient(
+  'gradle/wrapper-validation-action',
+  undefined,
+  {allowRetries: true, maxRetries: 3}
+)
 
 export async function fetchValidChecksums(
   allowSnapshots: boolean

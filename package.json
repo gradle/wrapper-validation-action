@@ -26,7 +26,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "1.2.6",
-    "typed-rest-client": "1.7.3",
+    "typed-rest-client": "1.8.4",
     "unhomoglyph": "1.0.6"
   },
   "devDependencies": {
