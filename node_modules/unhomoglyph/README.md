@@ -6,7 +6,7 @@
 > Replace all homoglyphs with base characters. Useful to detect similar strings.
 For example, to prohibit register similar looking nicknames at websites.
 
-Data source - [Recommended confusable mapping for IDN](http://www.unicode.org/Public/security/latest/confusables.txt), v12.1.0.
+Data source - [Recommended confusable mapping for IDN](http://www.unicode.org/Public/security/latest/confusables.txt), v13.0.0.
 
 __Note!__ Text after transform is NOT intended be read by humans. For example,
 `m` will be transformed to `r` + `n`. Goal is to compare 2 strings after
