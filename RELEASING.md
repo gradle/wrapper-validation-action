@@ -1,6 +1,7 @@
 # Release
 
 * starting on `master`
+* `npm install`
 * `npm run all`
 * `git checkout releases/v1`
 * `git merge master`
