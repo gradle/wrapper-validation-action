@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
+  "name": "wrapper-validation-action",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "Gradle Wrapper Validation Action",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -15,14 +15,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/gradle/wrapper-validation-action.git"
   },
   "keywords": [
     "actions",
     "node",
     "setup"
   ],
-  "author": "YourNameOrOrganization",
+  "author": "Gradle Inc.",
   "license": "MIT",
   "dependencies": {
     "@actions/core": "1.2.6",
