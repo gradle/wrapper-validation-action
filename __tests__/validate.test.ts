@@ -1,5 +1,6 @@
 import * as path from 'path'
 import * as validate from '../src/validate'
+import {expect, test} from '@jest/globals'
 
 const baseDir = path.resolve('.')
 
