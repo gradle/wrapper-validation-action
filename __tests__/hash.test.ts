@@ -1,5 +1,6 @@
 import * as path from 'path'
 import * as hash from '../src/hash'
+import {expect, test} from '@jest/globals'
 
 test('can sha256 files', async () => {
   const sha = await hash.sha256File(
