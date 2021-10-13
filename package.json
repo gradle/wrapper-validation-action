@@ -4,6 +4,7 @@
   "private": true,
   "description": "Gradle Wrapper Validation Action",
   "main": "lib/main.js",
+  "bin": "lib/main.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write **/*.ts",
@@ -26,6 +27,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/core": "1.4.0",
+    "commander": "^8.2.0",
     "typed-rest-client": "1.8.4",
     "unhomoglyph": "1.0.6"
   },

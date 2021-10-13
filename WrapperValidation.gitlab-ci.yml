@@ -1,0 +1,8 @@
+
+validate-wrapper:
+  stage: .pre
+  image:
+    name: <path to docker image>
+    entrypoint: [""]
+  script:
+    - wrapper-validation-action
