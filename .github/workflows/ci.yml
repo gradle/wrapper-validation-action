@@ -43,7 +43,7 @@ jobs:
           npm install -g gitlab-ci-local
           mkdir -p .gitlab-ci-local
           echo "global:" > .gitlab-ci-local/variables.yml
-          echo "\tIMAGE_NAME: $IMAGE_NAME" >> .gitlab-ci-local/variables.yml
+          echo "  IMAGE_NAME: $IMAGE_NAME" >> .gitlab-ci-local/variables.yml
 
       - name: Testing GitLab CI
         run: |
