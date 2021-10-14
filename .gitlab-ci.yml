@@ -6,28 +6,30 @@
 # Author: Florent CHAUVEAU <florent.chauveau@gmail.com>
 # Mentioned here: https://blog.callr.tech/building-docker-images-with-gitlab-ci-best-practices/
 
-# do not use "latest" here, if you want this to work in the future
-image: docker:20
+
 
 stages:
   - build
   - test
   - push
 
-services:
-- docker:20-dind
+.docker: 
+  # do not use "latest" here, if you want this to work in the future
+  image: docker:20
+  services:
+  - docker:20-dind
+  # Use this if your GitLab runner does not use socket binding
+  # services:
+  #   - docker:dind
 
-# Use this if your GitLab runner does not use socket binding
-# services:
-#   - docker:dind
-
-before_script:
-  # docker login asks for the password to be passed through stdin for security
-  # we use $CI_REGISTRY_PASSWORD here which is a special variable provided by GitLab
-  # https://docs.gitlab.com/ce/ci/variables/predefined_variables.html
-  - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
+  before_script:
+    # docker login asks for the password to be passed through stdin for security
+    # we use $CI_REGISTRY_PASSWORD here which is a special variable provided by GitLab
+    # https://docs.gitlab.com/ce/ci/variables/predefined_variables.html
+    - echo -n $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER --password-stdin $CI_REGISTRY
 
 Build:
+  extends: .docker
   stage: build
   script:
     # fetches the latest image (not failing if image is not found)
@@ -39,9 +41,6 @@ Build:
     - >
       docker build
       --pull
-      --build-arg http_proxy=$http_proxy
-      --build-arg https_proxy=$https_proxy
-      --build-arg no_proxy=$no_proxy
       --cache-from $CI_REGISTRY_IMAGE:latest
       --label "org.opencontainers.image.title=$CI_PROJECT_TITLE"
       --label "org.opencontainers.image.url=$CI_PROJECT_URL"
@@ -65,6 +64,7 @@ validate-wrapper:
 
 # Here, the goal is to tag the "master" branch as "latest"
 Push latest:
+  extends: .docker
   variables:
     # We are just playing with Docker here. 
     # We do not need GitLab to clone the source code.
@@ -85,6 +85,7 @@ Push latest:
 # Finally, the goal here is to Docker tag any Git tag
 # GitLab will start a new pipeline everytime a Git tag is created, which is pretty awesome
 Push tag:
+  extends: .docker
   variables:
     # Again, we do not need the source code here. Just playing with Docker.
     GIT_STRATEGY: none
