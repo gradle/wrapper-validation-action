@@ -44,10 +44,11 @@ jobs:
           mkdir -p .gitlab-ci-local
           echo "global:" > .gitlab-ci-local/variables.yml
           echo "\tIMAGE_NAME: $IMAGE_NAME" >> .gitlab-ci-local/variables.yml
-          
+
       - name: Testing GitLab CI
         run: |
-          gitlab-ci-local --file __tests__/.gitlab-ci.yml --home ./
+          cat .gitlab-ci-local/variables.yml
+          gitlab-ci-local --home ./ --file __tests__/.gitlab-ci.yml
 
       - name: Log in to registry
         # This is where you will update the PAT to GITHUB_TOKEN
