@@ -1,8 +1,7 @@
-
 validate-wrapper:
   stage: .pre
   image:
-    name: wrapper-validation:latest
+    name: registry.gitlab.com/netconomy/personal/r.akasheh/gradle-wrapper-validation:7ac3c97443f1f9b80d26602937e9c19bf4b6a3f2
     entrypoint: [""]
   script:
     - echo "wrapper-validation --min-wrapper-count=$MIN_WRAPPER_COUNT"
