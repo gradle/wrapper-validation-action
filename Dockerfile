@@ -1,11 +1,11 @@
-FROM node:12.9.1
+FROM node:12-slim
+
 ENV NODE_ENV=production
+
 WORKDIR /app
-
-COPY ["package.json","package-lock.json*", "./"]
-
-RUN npm install --production
 
 COPY . .
 
-CMD ["node", "dist/index.js"]
+RUN npm install && npm run-script build && npm install -g
+
+ENTRYPOINT [ "wrapper-validation" ]

@@ -1,0 +1,9 @@
+
+validate-wrapper:
+  stage: .pre
+  image:
+    name: wrapper-validation:latest
+    entrypoint: [""]
+  script:
+    - echo "wrapper-validation --min-wrapper-count=$MIN_WRAPPER_COUNT"
+    - wrapper-validation --min-wrapper-count=$MIN_WRAPPER_COUNT
