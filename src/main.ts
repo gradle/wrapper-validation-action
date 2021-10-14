@@ -36,7 +36,7 @@ export async function run(): Promise<void> {
       const program = new Command()
       // const actionYaml = jsyaml.load(await fs.readFile(path.resolve('action.yml'), 'utf8')) as Action
       console.log(process.cwd())
-      const actionYaml = jsyaml.load(await fs.readFile(require.resolve('action.yml'), 'utf8')) as Action
+      const actionYaml = jsyaml.load(await fs.readFile('./action.yml', 'utf8')) as Action
 
       program
         .description(actionYaml.description)
