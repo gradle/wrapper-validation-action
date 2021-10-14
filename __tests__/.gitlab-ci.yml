@@ -13,7 +13,9 @@ job:
     - echo "IMAGE $IMAGE_NAME"
 
 validate-wrapper:
-  image: $IMAGE_NAME
+  image: 
+    name: $IMAGE_NAME
+    entrypoint: [""]
   stage: test
   before_script:
     - cd __tests__/data/valid
