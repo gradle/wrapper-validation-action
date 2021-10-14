@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import path from 'path'
+import { resolve, dirname } from 'path'
 import { promises as fs } from 'fs'
 import { setFailed, getInput, info } from '@actions/core'
 
@@ -34,9 +34,7 @@ export async function run(): Promise<void> {
 
     } else {
       const program = new Command()
-      // const actionYaml = jsyaml.load(await fs.readFile(path.resolve('action.yml'), 'utf8')) as Action
-      console.log(process.cwd())
-      const actionYaml = jsyaml.load(await fs.readFile('./action.yml', 'utf8')) as Action
+      const actionYaml = jsyaml.load(await fs.readFile(dirname(require.main?.filename ??'') + '/../action.yml', 'utf8')) as Action
 
       program
         .description(actionYaml.description)
@@ -56,7 +54,7 @@ export async function run(): Promise<void> {
     }
 
     const result = await findInvalidWrapperJars(
-      path.resolve('.'),
+      resolve('.'),
       minWrapperCount,
       allowSnapshots === 'true',
       allowChecksums.split(',')

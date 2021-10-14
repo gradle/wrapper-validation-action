@@ -1,7 +1,7 @@
 validate-wrapper:
   stage: .pre
   image:
-    name: registry.gitlab.com/netconomy/personal/r.akasheh/gradle-wrapper-validation:latest
+    name: ghcr.io/aepfli/wrapper-validation:latest
     entrypoint: [""]
   script:
     - wrapper-validation

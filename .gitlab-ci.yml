@@ -52,17 +52,12 @@ Build:
     - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
 
 include:
-  - local: WrapperValidation.gitlab-ci.yml
+  - local: __tests__/.gitlab-ci.yml
 
 validate-wrapper:
-  stage: test
-  before_script: 
-    - cd __tests__
   image: 
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     entrypoint: [""]
-  variables:
-    ALLOW_CHECKSUMS: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
 
 # Here, the goal is to tag the "master" branch as "latest"
 Push latest:
