@@ -5,4 +5,4 @@ validate-wrapper:
     name: <path to docker image>
     entrypoint: [""]
   script:
-    - wrapper-validation-action
+    - wrapper-validation

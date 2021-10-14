@@ -4,7 +4,9 @@
   "private": true,
   "description": "Gradle Wrapper Validation Action",
   "main": "lib/main.js",
-  "bin": "lib/main.js",
+  "bin": {
+    "wrapper-validation": "lib/main.js"
+  },
   "scripts": {
     "build": "tsc",
     "format": "prettier --write **/*.ts",
