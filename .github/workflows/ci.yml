@@ -38,10 +38,16 @@ jobs:
       - name: Build image
         run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
 
-      - name: Test image
+      - name: Setting up GitLab CI
         run: |
           npm install -g gitlab-ci-local
-          gitlab-ci-local --file __tests__/.gitlab-ci.yml
+          mkdir -p .gitlab-ci-local
+          echo "global:" > .gitlab-ci-local/variables.yml
+          echo "\tIMAGE_NAME: $IMAGE_NAME" >> .gitlab-ci-local/variables.yml
+          
+      - name: Testing GitLab CI
+        run: |
+          gitlab-ci-local --file __tests__/.gitlab-ci.yml --home ./
 
       - name: Log in to registry
         # This is where you will update the PAT to GITHUB_TOKEN
