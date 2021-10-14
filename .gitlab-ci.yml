@@ -56,6 +56,8 @@ include:
 
 validate-wrapper:
   stage: test
+  before_script: 
+    - cd __tests__
   image: 
     name: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
     entrypoint: [""]
