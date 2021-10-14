@@ -1,0 +1,7 @@
+validate-wrapper:
+  stage: .pre
+  image:
+    name: ghcr.io/aepfli/wrapper-validation:latest
+    entrypoint: [""]
+  script:
+    - wrapper-validation
