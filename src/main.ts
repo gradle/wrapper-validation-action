@@ -2,7 +2,7 @@
 
 import path from 'path'
 import { promises as fs } from 'fs'
-import core from '@actions/core'
+import { setFailed, getInput, info} from '@actions/core'
 
 import { findInvalidWrapperJars } from './validate'
 import { Command } from 'commander'
@@ -28,9 +28,9 @@ export async function run(): Promise<void> {
     let allowChecksums: string
     
     if (process.env.GITHUB_ACTION) {
-      minWrapperCount = +core.getInput('min-wrapper-count')
-      allowSnapshots = core.getInput('allow-snapshots')
-      allowChecksums = core.getInput('allow-checksums')
+      minWrapperCount = +getInput('min-wrapper-count')
+      allowSnapshots = getInput('allow-snapshots')
+      allowChecksums = getInput('allow-checksums')
 
     } else {
       const program = new Command()
@@ -38,7 +38,6 @@ export async function run(): Promise<void> {
 
       program
         .description(actionYaml.description)
-        .name('wrapper-validation')
       
       Object.entries(actionYaml.inputs).forEach(([key,value]) => {
           program.option(`--${key} <value>`, value.description, value.default)
@@ -55,19 +54,18 @@ export async function run(): Promise<void> {
       path.resolve('.'),
       minWrapperCount,
       allowSnapshots === 'true',
-      // --allow-snapshots , --allow-snapshots false/true
       allowChecksums.split(',')
     )
     if (result.isValid()) {
-      core.info(result.toDisplayString())
+      info(result.toDisplayString())
     } else {
-      core.setFailed(
+      setFailed(
         `Gradle Wrapper Validation Failed!\n  See https://github.com/gradle/wrapper-validation-action#reporting-failures\n${result.toDisplayString()}`
       )
     }
   } catch (error) {
     if(error instanceof Error)
-      core.setFailed(error.message)
+      setFailed(error.message)
   }
 }
 

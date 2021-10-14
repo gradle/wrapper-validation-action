@@ -8,4 +8,4 @@ COPY . .
 
 RUN npm install && npm run-script build && npm install -g
 
-ENTRYPOINT [ "wrapper-validation"]
+ENTRYPOINT [ "wrapper-validation" ]

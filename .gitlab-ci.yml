@@ -1,0 +1,8 @@
+
+
+include:
+  - local: WrapperValidation.gitlab-ci.yml
+
+validate-wrapper:
+  variables:
+    MIN_WRAPPER_COUNT: 10

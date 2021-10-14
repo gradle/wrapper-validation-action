@@ -2,7 +2,8 @@
 validate-wrapper:
   stage: .pre
   image:
-    name: <path to docker image>
+    name: wrapper-validation:latest
     entrypoint: [""]
   script:
-    - wrapper-validation
+    - echo "wrapper-validation --min-wrapper-count=$MIN_WRAPPER_COUNT"
+    - wrapper-validation --min-wrapper-count=$MIN_WRAPPER_COUNT
