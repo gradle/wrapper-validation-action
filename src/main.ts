@@ -2,10 +2,10 @@
 
 import path from 'path'
 import { promises as fs } from 'fs'
-import { setFailed, getInput, info} from '@actions/core'
+import { setFailed, getInput, info } from '@actions/core'
 
 import { findInvalidWrapperJars } from './validate'
-import { Command } from 'commander'
+import { Command, Option } from 'commander'
 import jsyaml from 'js-yaml'
 
 interface Action {
@@ -18,7 +18,7 @@ interface Action {
 interface Input {
   description: string;
   required?: boolean;
-  default?: string; 
+  default?: string;
 }
 
 export async function run(): Promise<void> {
@@ -26,7 +26,7 @@ export async function run(): Promise<void> {
     let minWrapperCount: number
     let allowSnapshots: string
     let allowChecksums: string
-    
+
     if (process.env.GITHUB_ACTION) {
       minWrapperCount = +getInput('min-wrapper-count')
       allowSnapshots = getInput('allow-snapshots')
@@ -38,9 +38,12 @@ export async function run(): Promise<void> {
 
       program
         .description(actionYaml.description)
-      
-      Object.entries(actionYaml.inputs).forEach(([key,value]) => {
-          program.option(`--${key} <value>`, value.description, value.default)
+
+      Object.entries(actionYaml.inputs).forEach(([key, value]) => {
+        program.addOption(
+          new Option(`--${key} <value>`, value.description)
+            .default(value.default)
+            .env(key.toLocaleUpperCase().replace(/-/g, '_')))
       })
 
       program.parse(process.argv)
@@ -64,7 +67,7 @@ export async function run(): Promise<void> {
       )
     }
   } catch (error) {
-    if(error instanceof Error)
+    if (error instanceof Error)
       setFailed(error.message)
   }
 }
