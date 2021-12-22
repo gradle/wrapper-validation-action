@@ -6,6 +6,9 @@ on: # rebuild any PRs and main branch changes
       - master
       - 'releases/*'
 
+env:
+  IMAGE_NAME: wrapper-validation
+
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
@@ -22,3 +25,49 @@ jobs:
       with:
         # to allow the invalid wrapper jar present in test data
         allow-checksums: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+
+      - name: Setting up GitLab CI
+        run: |
+          npm install -g gitlab-ci-local
+          mkdir -p .gitlab-ci-local
+          echo "global:" > .gitlab-ci-local/variables.yml
+          echo "  IMAGE_NAME: $IMAGE_NAME" >> .gitlab-ci-local/variables.yml
+
+      - name: Testing GitLab CI
+        run: |
+          cat .gitlab-ci-local/variables.yml
+          gitlab-ci-local --home ./ --file __tests__/.gitlab-ci.yml
+
+      - name: Log in to registry
+        # This is where you will update the PAT to GITHUB_TOKEN
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        if: github.event_name != 'pull_request'
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+        if: github.event_name != 'pull_request'

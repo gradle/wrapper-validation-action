@@ -1,0 +1,51 @@
+
+
+include:
+  - local: WrapperValidation.gitlab-ci.yml
+
+.false-test:
+  script:
+    - wrapper-validation && false || true
+
+job:
+  stage: .pre
+  script:
+    - echo "IMAGE $IMAGE_NAME"
+
+validate-wrapper:
+  image: 
+    name: $IMAGE_NAME
+    entrypoint: [""]
+  stage: test
+  before_script:
+    - cd __tests__/data/valid
+
+validate-wrapper-numbers:
+  extends: 
+    - validate-wrapper
+  variables:
+    MIN_WRAPPER_COUNT: 1
+  
+.validate-wrapper-invalid:
+  extends: 
+    - validate-wrapper
+  before_script:
+    - cd __tests__/data/invalid
+
+validate-wrapper-invalid-with-checksum:
+  extends: 
+    - .validate-wrapper-invalid
+  variables:
+    ALLOW_CHECKSUMS: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+validate-wrapper-invalid-failing:
+  extends: 
+    - .validate-wrapper-invalid
+    - .false-test
+
+validate-wrapper-invalid-numbers-exceeded:
+  extends: 
+    - .validate-wrapper-invalid
+    - .false-test
+  variables:
+    MIN_WRAPPER_COUNT: 3

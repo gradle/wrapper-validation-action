@@ -104,3 +104,11 @@ Regardless of what you find, we still kindly request that you reach out to us an
 
 To learn more about verifying the Gradle Wrapper JAR locally, see our
 [guide on the topic](https://docs.gradle.org/current/userguide/gradle_wrapper.html#wrapper_checksum_verification).
+
+
+## Usage in GitLab CI
+
+```yaml
+include:
+  - remote: https://raw.githubusercontent.com/gradle/wrapper-validation-action/master/WrapperValidation.gitlab-ci.yml
+```
