@@ -1,5 +1,6 @@
 import * as path from 'path'
 import * as find from '../src/find'
+import {expect, test} from '@jest/globals'
 
 test('finds test data wrapper jars', async () => {
   const repoRoot = path.resolve('.')

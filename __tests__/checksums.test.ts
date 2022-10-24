@@ -1,5 +1,8 @@
 import * as checksums from '../src/checksums'
 import nock from 'nock'
+import {afterEach, describe, expect, test, jest} from '@jest/globals'
+
+jest.setTimeout(30000)
 
 test('fetches wrapper jars checksums', async () => {
   const validChecksums = await checksums.fetchValidChecksums(false)

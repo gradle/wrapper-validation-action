@@ -1,5 +1,8 @@
 import * as path from 'path'
 import * as validate from '../src/validate'
+import {expect, test, jest} from '@jest/globals'
+
+jest.setTimeout(30000)
 
 const baseDir = path.resolve('.')
 
