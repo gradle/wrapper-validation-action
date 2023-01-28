@@ -97,7 +97,7 @@ we highly recommend that you reach out to us at [security@gradle.com](mailto:sec
 If the Gradle version in `gradle-wrapper.properties` is out of this range, you may need to regenerate the `gradle-wrapper.jar` by running `./gradlew wrapper`. If you need to use a version of Gradle between 3.3 and 4.0, you can use a newer version of Gradle to generate the `gradle-wrapper.jar`.
 
 If you're curious and want to explore what the differences are between the `gradle-wrapper.jar` in your possession
-and one of our valid release, you can compare them using this online utility: [DiffScope](https://try.diffoscope.org/).
+and one of our valid release, you can compare them using this online utility: [diffoscope](https://try.diffoscope.org/).
 Regardless of what you find, we still kindly request that you reach out to us and let us know.
 
 ## Resources
