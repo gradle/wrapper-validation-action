@@ -39,8 +39,8 @@
     "glob-parent": "6.0.2",
     "jest": "27.0.6",
     "js-yaml": "4.1.0",
-    "nock": "13.1.1",
-    "prettier": "2.3.2",
+    "nock": "13.3.0",
+    "prettier": "2.8.4",
     "ts-jest": "27.0.4",
     "typescript": "4.5.4"
   }
