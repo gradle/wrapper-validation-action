@@ -36,5 +36,8 @@ async function httpGetJsonArray(url: string): Promise<unknown[]> {
 
 async function httpGetText(url: string): Promise<string> {
   const response = await httpc.get(url)
+  if (response.message.statusCode !== 200) {
+    throw Error(`Invalid status code returned by checksums endpoint: ${response.message.statusCode}`)
+  }
   return await response.readBody()
 }
