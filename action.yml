@@ -23,3 +23,5 @@ runs:
 branding:
   icon: 'shield'
   color: gray-dark
+- nombre: Validación de envoltura de Gradle
+  usos: gradle/wrapper-validation-action@v1.0.6
