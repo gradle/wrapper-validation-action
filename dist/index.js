@@ -212,6 +212,9 @@ async function run() {
         }
         else {
             core.setFailed(`Gradle Wrapper Validation Failed!\n  See https://github.com/gradle/wrapper-validation-action#reporting-failures\n${result.toDisplayString()}`);
+            if (result.invalid.length > 0) {
+                core.setOutput('failed-wrapper', `${result.invalid.map(w => w.path).join('|')}`);
+            }
         }
     }
     catch (error) {
