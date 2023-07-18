@@ -16,6 +16,10 @@ inputs:
     required: false
     default: ''
 
+outputs:
+  failed-wrapper:
+    description: The path of the Gradle Wrapper(s) JAR that failed validation.
+
 runs:
   using: 'node16'
   main: 'dist/index.js'
