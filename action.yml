@@ -12,8 +12,7 @@ inputs:
     required: false
     default: 'false'
   allow-checksums:
-    description: 'Accept arbitrary user-defined checksums as valid. Comma separated list of SHA256 checksums (lowercase hex).'
-    required: false
+    description: 'Accept arbitrary user-defined checksums as valid. Comma separated list of SHA256 checksums (lowercase hex).' required: false
     default: ''
 
 outputs:
@@ -21,7 +20,7 @@ outputs:
     description: The path of the Gradle Wrapper(s) JAR that failed validation.
 
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
 
 branding:
