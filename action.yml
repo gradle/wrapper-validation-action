@@ -12,7 +12,8 @@ inputs:
     required: false
     default: 'false'
   allow-checksums:
-    description: 'Accept arbitrary user-defined checksums as valid. Comma separated list of SHA256 checksums (lowercase hex).' required: false
+    description: 'Accept arbitrary user-defined checksums as valid. Comma separated list of SHA256 checksums (lowercase hex).'
+    required: false
     default: ''
 
 outputs:
