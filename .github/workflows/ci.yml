@@ -10,11 +10,12 @@ jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Set Node.js 16.x
-      uses: actions/setup-node@v3.7.0
+    - uses: actions/checkout@v4
+    - name: Set Node.js 20.x
+      uses: actions/setup-node@v4.0.1
       with:
-        node-version: 16.x
+        node-version: 20.x
+        cache: npm
     - run: |
         npm -v
         node -v
@@ -23,7 +24,7 @@ jobs:
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ./
       with:
         # to allow the invalid wrapper jar present in test data
