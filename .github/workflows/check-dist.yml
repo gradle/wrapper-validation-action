@@ -21,13 +21,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set Node.js 16.x
-        uses: actions/setup-node@v3.7.0
+      - name: Set Node.js 20.x
+        uses: actions/setup-node@v4.0.1
         with:
-          node-version: 16.x
-      
+          node-version: 20.x
+
       - name: Validate package-lock
         run: npx lockfile-lint --path package-lock.json --allowed-hosts npm yarn --validate-https
 
