@@ -3,15 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "description": "Gradle Wrapper Validation Action",
-  "main": "lib/main.js",
+  "main": "src/main.ts",
   "scripts": {
-    "build": "tsc",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
-    "pack": "ncc build",
+    "check": "npm run format && npm run lint",
+    "compile": "ncc build",
     "test": "jest",
-    "all": "npm run build && npm run format && npm run lint && npm run pack && npm test"
+    "build": "npm run check && npm run compile",
+    "all": "npm run build && npm test"
   },
   "repository": {
     "type": "git",
