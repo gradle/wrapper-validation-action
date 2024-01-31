@@ -1,337 +1,6 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 4382:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.fetchValidChecksums = void 0;
-const httpm = __importStar(__nccwpck_require__(5538));
-const httpc = new httpm.HttpClient('gradle/wrapper-validation-action', undefined, { allowRetries: true, maxRetries: 3 });
-async function fetchValidChecksums(allowSnapshots) {
-    const all = await httpGetJsonArray('https://services.gradle.org/versions/all');
-    const withChecksum = all.filter(entry => typeof entry === 'object' &&
-        entry != null &&
-        entry.hasOwnProperty('wrapperChecksumUrl'));
-    const allowed = withChecksum.filter(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (entry) => allowSnapshots || !entry.snapshot);
-    const checksumUrls = allowed.map(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (entry) => entry.wrapperChecksumUrl);
-    const checksums = await Promise.all(checksumUrls.map(async (url) => httpGetText(url)));
-    return [...new Set(checksums)];
-}
-exports.fetchValidChecksums = fetchValidChecksums;
-async function httpGetJsonArray(url) {
-    return JSON.parse(await httpGetText(url));
-}
-async function httpGetText(url) {
-    const response = await httpc.get(url);
-    return await response.readBody();
-}
-
-
-/***/ }),
-
-/***/ 548:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.findWrapperJars = void 0;
-const util = __importStar(__nccwpck_require__(3837));
-const path = __importStar(__nccwpck_require__(1017));
-const fs = __importStar(__nccwpck_require__(7147));
-const unhomoglyph_1 = __importDefault(__nccwpck_require__(8708));
-const readdir = util.promisify(fs.readdir);
-async function findWrapperJars(baseDir) {
-    const files = await recursivelyListFiles(baseDir);
-    return files
-        .filter(file => (0, unhomoglyph_1.default)(file).endsWith('gradle-wrapper.jar'))
-        .map(wrapperJar => path.relative(baseDir, wrapperJar))
-        .sort((a, b) => a.localeCompare(b));
-}
-exports.findWrapperJars = findWrapperJars;
-async function recursivelyListFiles(baseDir) {
-    const childrenNames = await readdir(baseDir);
-    const childrenPaths = await Promise.all(childrenNames.map(async (childName) => {
-        const childPath = path.resolve(baseDir, childName);
-        return fs.lstatSync(childPath).isDirectory()
-            ? recursivelyListFiles(childPath)
-            : new Promise(resolve => resolve([childPath]));
-    }));
-    return Array.prototype.concat(...childrenPaths);
-}
-
-
-/***/ }),
-
-/***/ 1859:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sha256File = void 0;
-const crypto = __importStar(__nccwpck_require__(6113));
-const fs = __importStar(__nccwpck_require__(7147));
-async function sha256File(path) {
-    return new Promise((resolve, reject) => {
-        const hash = crypto.createHash('sha256');
-        const stream = fs.createReadStream(path);
-        stream.on('data', data => hash.update(data));
-        stream.on('end', () => {
-            stream.destroy();
-            resolve(hash.digest('hex'));
-        });
-        stream.on('error', error => {
-            stream.destroy();
-            reject(error);
-        });
-    });
-}
-exports.sha256File = sha256File;
-
-
-/***/ }),
-
-/***/ 3109:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = void 0;
-const path = __importStar(__nccwpck_require__(1017));
-const core = __importStar(__nccwpck_require__(2186));
-const validate = __importStar(__nccwpck_require__(1997));
-async function run() {
-    try {
-        const result = await validate.findInvalidWrapperJars(path.resolve('.'), +core.getInput('min-wrapper-count'), core.getInput('allow-snapshots') === 'true', core.getInput('allow-checksums').split(','));
-        if (result.isValid()) {
-            core.info(result.toDisplayString());
-        }
-        else {
-            core.setFailed(`Gradle Wrapper Validation Failed!\n  See https://github.com/gradle/wrapper-validation-action#reporting-failures\n${result.toDisplayString()}`);
-            if (result.invalid.length > 0) {
-                core.setOutput('failed-wrapper', `${result.invalid.map(w => w.path).join('|')}`);
-            }
-        }
-    }
-    catch (error) {
-        if (error instanceof Error) {
-            core.setFailed(error.message);
-        }
-        else {
-            core.setFailed(`Unknown object was thrown: ${error}`);
-        }
-    }
-}
-exports.run = run;
-run();
-
-
-/***/ }),
-
-/***/ 1997:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.WrapperJar = exports.ValidationResult = exports.findInvalidWrapperJars = void 0;
-const find = __importStar(__nccwpck_require__(548));
-const checksums = __importStar(__nccwpck_require__(4382));
-const hash = __importStar(__nccwpck_require__(1859));
-async function findInvalidWrapperJars(gitRepoRoot, minWrapperCount, allowSnapshots, allowChecksums) {
-    const wrapperJars = await find.findWrapperJars(gitRepoRoot);
-    const result = new ValidationResult([], []);
-    if (wrapperJars.length < minWrapperCount) {
-        result.errors.push(`Expected to find at least ${minWrapperCount} Gradle Wrapper JARs but got only ${wrapperJars.length}`);
-    }
-    if (wrapperJars.length > 0) {
-        const validChecksums = await checksums.fetchValidChecksums(allowSnapshots);
-        validChecksums.push(...allowChecksums);
-        for (const wrapperJar of wrapperJars) {
-            const sha = await hash.sha256File(wrapperJar);
-            if (!validChecksums.includes(sha)) {
-                result.invalid.push(new WrapperJar(wrapperJar, sha));
-            }
-            else {
-                result.valid.push(new WrapperJar(wrapperJar, sha));
-            }
-        }
-    }
-    return result;
-}
-exports.findInvalidWrapperJars = findInvalidWrapperJars;
-class ValidationResult {
-    constructor(valid, invalid) {
-        this.errors = [];
-        this.valid = valid;
-        this.invalid = invalid;
-    }
-    isValid() {
-        return this.invalid.length === 0 && this.errors.length === 0;
-    }
-    toDisplayString() {
-        let displayString = '';
-        if (this.invalid.length > 0) {
-            displayString += `✗ Found unknown Gradle Wrapper JAR files:\n${ValidationResult.toDisplayList(this.invalid)}`;
-        }
-        if (this.errors.length > 0) {
-            if (displayString.length > 0)
-                displayString += '\n';
-            displayString += `✗ Other validation errors:\n  ${this.errors.join(`\n  `)}`;
-        }
-        if (this.valid.length > 0) {
-            if (displayString.length > 0)
-                displayString += '\n';
-            displayString += `✓ Found known Gradle Wrapper JAR files:\n${ValidationResult.toDisplayList(this.valid)}`;
-        }
-        return displayString;
-    }
-    static toDisplayList(wrapperJars) {
-        return `  ${wrapperJars.map(wj => wj.toDisplayString()).join(`\n  `)}`;
-    }
-}
-exports.ValidationResult = ValidationResult;
-class WrapperJar {
-    constructor(path, checksum) {
-        this.path = path;
-        this.checksum = checksum;
-    }
-    toDisplayString() {
-        return `${this.checksum} ${this.path}`;
-    }
-}
-exports.WrapperJar = WrapperJar;
-
-
-/***/ }),
-
 /***/ 7351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -28141,6 +27810,337 @@ exports["default"] = _default;
 
 /***/ }),
 
+/***/ 1541:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.fetchValidChecksums = void 0;
+const httpm = __importStar(__nccwpck_require__(5538));
+const httpc = new httpm.HttpClient('gradle/wrapper-validation-action', undefined, { allowRetries: true, maxRetries: 3 });
+async function fetchValidChecksums(allowSnapshots) {
+    const all = await httpGetJsonArray('https://services.gradle.org/versions/all');
+    const withChecksum = all.filter(entry => typeof entry === 'object' &&
+        entry != null &&
+        entry.hasOwnProperty('wrapperChecksumUrl'));
+    const allowed = withChecksum.filter(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (entry) => allowSnapshots || !entry.snapshot);
+    const checksumUrls = allowed.map(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (entry) => entry.wrapperChecksumUrl);
+    const checksums = await Promise.all(checksumUrls.map(async (url) => httpGetText(url)));
+    return [...new Set(checksums)];
+}
+exports.fetchValidChecksums = fetchValidChecksums;
+async function httpGetJsonArray(url) {
+    return JSON.parse(await httpGetText(url));
+}
+async function httpGetText(url) {
+    const response = await httpc.get(url);
+    return await response.readBody();
+}
+
+
+/***/ }),
+
+/***/ 3288:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.findWrapperJars = void 0;
+const util = __importStar(__nccwpck_require__(3837));
+const path = __importStar(__nccwpck_require__(1017));
+const fs = __importStar(__nccwpck_require__(7147));
+const unhomoglyph_1 = __importDefault(__nccwpck_require__(8708));
+const readdir = util.promisify(fs.readdir);
+async function findWrapperJars(baseDir) {
+    const files = await recursivelyListFiles(baseDir);
+    return files
+        .filter(file => (0, unhomoglyph_1.default)(file).endsWith('gradle-wrapper.jar'))
+        .map(wrapperJar => path.relative(baseDir, wrapperJar))
+        .sort((a, b) => a.localeCompare(b));
+}
+exports.findWrapperJars = findWrapperJars;
+async function recursivelyListFiles(baseDir) {
+    const childrenNames = await readdir(baseDir);
+    const childrenPaths = await Promise.all(childrenNames.map(async (childName) => {
+        const childPath = path.resolve(baseDir, childName);
+        return fs.lstatSync(childPath).isDirectory()
+            ? recursivelyListFiles(childPath)
+            : new Promise(resolve => resolve([childPath]));
+    }));
+    return Array.prototype.concat(...childrenPaths);
+}
+
+
+/***/ }),
+
+/***/ 9778:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.sha256File = void 0;
+const crypto = __importStar(__nccwpck_require__(6113));
+const fs = __importStar(__nccwpck_require__(7147));
+async function sha256File(path) {
+    return new Promise((resolve, reject) => {
+        const hash = crypto.createHash('sha256');
+        const stream = fs.createReadStream(path);
+        stream.on('data', data => hash.update(data));
+        stream.on('end', () => {
+            stream.destroy();
+            resolve(hash.digest('hex'));
+        });
+        stream.on('error', error => {
+            stream.destroy();
+            reject(error);
+        });
+    });
+}
+exports.sha256File = sha256File;
+
+
+/***/ }),
+
+/***/ 399:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.run = void 0;
+const path = __importStar(__nccwpck_require__(1017));
+const core = __importStar(__nccwpck_require__(2186));
+const validate = __importStar(__nccwpck_require__(4953));
+async function run() {
+    try {
+        const result = await validate.findInvalidWrapperJars(path.resolve('.'), +core.getInput('min-wrapper-count'), core.getInput('allow-snapshots') === 'true', core.getInput('allow-checksums').split(','));
+        if (result.isValid()) {
+            core.info(result.toDisplayString());
+        }
+        else {
+            core.setFailed(`Gradle Wrapper Validation Failed!\n  See https://github.com/gradle/wrapper-validation-action#reporting-failures\n${result.toDisplayString()}`);
+            if (result.invalid.length > 0) {
+                core.setOutput('failed-wrapper', `${result.invalid.map(w => w.path).join('|')}`);
+            }
+        }
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            core.setFailed(error.message);
+        }
+        else {
+            core.setFailed(`Unknown object was thrown: ${error}`);
+        }
+    }
+}
+exports.run = run;
+run();
+
+
+/***/ }),
+
+/***/ 4953:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.WrapperJar = exports.ValidationResult = exports.findInvalidWrapperJars = void 0;
+const find = __importStar(__nccwpck_require__(3288));
+const checksums = __importStar(__nccwpck_require__(1541));
+const hash = __importStar(__nccwpck_require__(9778));
+async function findInvalidWrapperJars(gitRepoRoot, minWrapperCount, allowSnapshots, allowChecksums) {
+    const wrapperJars = await find.findWrapperJars(gitRepoRoot);
+    const result = new ValidationResult([], []);
+    if (wrapperJars.length < minWrapperCount) {
+        result.errors.push(`Expected to find at least ${minWrapperCount} Gradle Wrapper JARs but got only ${wrapperJars.length}`);
+    }
+    if (wrapperJars.length > 0) {
+        const validChecksums = await checksums.fetchValidChecksums(allowSnapshots);
+        validChecksums.push(...allowChecksums);
+        for (const wrapperJar of wrapperJars) {
+            const sha = await hash.sha256File(wrapperJar);
+            if (!validChecksums.includes(sha)) {
+                result.invalid.push(new WrapperJar(wrapperJar, sha));
+            }
+            else {
+                result.valid.push(new WrapperJar(wrapperJar, sha));
+            }
+        }
+    }
+    return result;
+}
+exports.findInvalidWrapperJars = findInvalidWrapperJars;
+class ValidationResult {
+    constructor(valid, invalid) {
+        this.errors = [];
+        this.valid = valid;
+        this.invalid = invalid;
+    }
+    isValid() {
+        return this.invalid.length === 0 && this.errors.length === 0;
+    }
+    toDisplayString() {
+        let displayString = '';
+        if (this.invalid.length > 0) {
+            displayString += `✗ Found unknown Gradle Wrapper JAR files:\n${ValidationResult.toDisplayList(this.invalid)}`;
+        }
+        if (this.errors.length > 0) {
+            if (displayString.length > 0)
+                displayString += '\n';
+            displayString += `✗ Other validation errors:\n  ${this.errors.join(`\n  `)}`;
+        }
+        if (this.valid.length > 0) {
+            if (displayString.length > 0)
+                displayString += '\n';
+            displayString += `✓ Found known Gradle Wrapper JAR files:\n${ValidationResult.toDisplayList(this.valid)}`;
+        }
+        return displayString;
+    }
+    static toDisplayList(wrapperJars) {
+        return `  ${wrapperJars.map(wj => wj.toDisplayString()).join(`\n  `)}`;
+    }
+}
+exports.ValidationResult = ValidationResult;
+class WrapperJar {
+    constructor(path, checksum) {
+        this.path = path;
+        this.checksum = checksum;
+    }
+    toDisplayString() {
+        return `${this.checksum} ${this.path}`;
+    }
+}
+exports.WrapperJar = WrapperJar;
+
+
+/***/ }),
+
 /***/ 9491:
 /***/ ((module) => {
 
@@ -30034,7 +30034,7 @@ module.exports = JSON.parse('{"0":"O","1":"l","֭":"֖","֮":"֘","֨":"֙","֤"
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(3109);
+/******/ 	var __webpack_exports__ = __nccwpck_require__(399);
 /******/ 	module.exports = __webpack_exports__;
 /******/ 	
 /******/ })()
