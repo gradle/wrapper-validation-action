@@ -6,7 +6,7 @@ jest.setTimeout(30000)
 
 test('fetches wrapper jars checksums', async () => {
   const validChecksums = await checksums.fetchValidChecksums(false)
-  expect(validChecksums.length).toBeGreaterThan(10)
+  expect(validChecksums.size).toBeGreaterThan(10)
 })
 
 describe('retry', () => {
@@ -25,7 +25,7 @@ describe('retry', () => {
         })
 
       const validChecksums = await checksums.fetchValidChecksums(false)
-      expect(validChecksums.length).toBeGreaterThan(10)
+      expect(validChecksums.size).toBeGreaterThan(10)
       nock.isDone()
     })
   })

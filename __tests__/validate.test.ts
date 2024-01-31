@@ -12,6 +12,30 @@ test('succeeds if all found wrapper jars are valid', async () => {
   ])
 
   expect(result.isValid()).toBe(true)
+  // Only hardcoded and explicitly allowed checksums should have been used
+  expect(result.fetchedChecksums).toBe(false)
+
+  expect(result.toDisplayString()).toBe(
+    '✓ Found known Gradle Wrapper JAR files:\n' +
+      '  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 __tests__/data/invalid/gradle-wrapper.jar\n' +
+      '  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 __tests__/data/invalid/gradlе-wrapper.jar\n' + // homoglyph
+      '  3888c76faa032ea8394b8a54e04ce2227ab1f4be64f65d450f8509fe112d38ce __tests__/data/valid/gradle-wrapper.jar'
+  )
+})
+
+test('succeeds if all found wrapper jars are valid (and checksums are fetched from Gradle API)', async () => {
+  const knownValidChecksums = new Map<string, Set<string>>()
+  const result = await validate.findInvalidWrapperJars(
+    baseDir,
+    1,
+    false,
+    ['e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'],
+    knownValidChecksums
+  )
+
+  expect(result.isValid()).toBe(true)
+  // Should have fetched checksums because no known checksums were provided
+  expect(result.fetchedChecksums).toBe(true)
 
   expect(result.toDisplayString()).toBe(
     '✓ Found known Gradle Wrapper JAR files:\n' +
