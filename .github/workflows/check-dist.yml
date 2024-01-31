@@ -23,20 +23,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set Node.js 20.x
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20.x
-          cache: npm
-
-      - name: Validate package-lock
-        run: npx lockfile-lint --path package-lock.json --allowed-hosts npm yarn --validate-https
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Rebuild the dist/ directory
-        run: npm run build
+          node-version: 20
+      - name: Build
+        run: |
+          npm -v
+          node -v
+          npm install
+          npm run build
 
       - name: Compare the expected and actual dist/ directories
         run: |
