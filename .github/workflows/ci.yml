@@ -11,21 +11,99 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - name: Set Node.js 20.x
+    - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 20.x
+        node-version: 20
         cache: npm
-    - run: |
+    - name: Build and test
+      run: |
         npm -v
         node -v
-        npm install
+        npm clean-install
         npm run all
-  test: # make sure the action works on a clean machine without building
+
+
+  # Integration test for successful validation of wrappers
+  test-validation-success:
+    name: 'Test: Validation success'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: ./
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Build action (pull request)
+      # Pull requests are not expected to update `dist/index.js` themselves; therefore build `dist/index.js`
+      # here before running integration test
+      if: github.event_name == 'pull_request'
+      run: |
+        npm clean-install
+        npm run build
+
+    - name: Run wrapper-validation-action
+      id: action-test
+      uses: ./
       with:
         # to allow the invalid wrapper jar present in test data
         allow-checksums: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+
+    - name: Check outcome
+      env:
+        # Evaluate workflow expressions here as env variable values instead of inside shell script
+        # below to not accidentally inject code into shell script or break its syntax
+        FAILED_WRAPPERS: ${{ steps.action-test.outputs.failed-wrapper }}
+        FAILED_WRAPPERS_MATCHES: ${{ steps.action-test.outputs.failed-wrapper == '' }}
+      run: |
+        if [ "$FAILED_WRAPPERS_MATCHES" != "true" ] ; then
+          echo "'outputs.failed-wrapper' has unexpected content: $FAILED_WRAPPERS"
+          exit 1
+        fi
+
+
+  # Integration test for failing validation of wrappers
+  test-validation-error:
+    name: 'Test: Validation error'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+
+    - name: Build action (pull request)
+      # Pull requests are not expected to update `dist/index.js` themselves; therefore build `dist/index.js`
+      # here before running integration test
+      if: github.event_name == 'pull_request'
+      run: |
+        npm clean-install
+        npm run build
+
+    - name: Run wrapper-validation-action
+      id: action-test
+      uses: ./
+      # Expected to fail; validated below
+      continue-on-error: true
+
+    - name: Check outcome
+      env:
+        # Evaluate workflow expressions here as env variable values instead of inside shell script
+        # below to not accidentally inject code into shell script or break its syntax
+        VALIDATION_FAILED: ${{ steps.action-test.outcome == 'failure' }}
+        FAILED_WRAPPERS: ${{ steps.action-test.outputs.failed-wrapper }}
+        FAILED_WRAPPERS_MATCHES: ${{ steps.action-test.outputs.failed-wrapper == '__tests__/data/invalid/gradle-wrapper.jar|__tests__/data/invalid/gradlе-wrapper.jar' }}
+      run: |
+        if [ "$VALIDATION_FAILED" != "true" ] ; then
+          echo "Expected validation to fail, but it didn't"
+          exit 1
+        fi
+
+        if [ "$FAILED_WRAPPERS_MATCHES" != "true" ] ; then
+          echo "'outputs.failed-wrapper' has unexpected content: $FAILED_WRAPPERS"
+          exit 1
+        fi
