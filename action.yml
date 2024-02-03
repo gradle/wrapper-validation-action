@@ -18,7 +18,7 @@ inputs:
 
 outputs:
   failed-wrapper:
-    description: The path of the Gradle Wrapper(s) JAR that failed validation.
+    description: 'The path of the Gradle Wrapper(s) JAR that failed validation. Path is a relative path to git repository root. Multiple paths are separated by a | character.'
 
 runs:
   using: 'node20'
