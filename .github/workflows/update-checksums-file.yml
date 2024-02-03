@@ -33,7 +33,7 @@ jobs:
       - name: Create or update pull request
         uses: peter-evans/create-pull-request@v6
         with:
-          branch: wrapper-checksums-update
+          branch: bot/wrapper-checksums-update
           commit-message: Update known wrapper checksums
           title: Update known wrapper checksums
           # Note: Unfortunately this action cannot trigger the regular workflows for the PR automatically, see
