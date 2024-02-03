@@ -31,7 +31,7 @@ jobs:
         run: |
           npm -v
           node -v
-          npm install
+          npm clean-install
           npm run build
 
       - name: Compare the expected and actual dist/ directories
