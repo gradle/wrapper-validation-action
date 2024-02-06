@@ -28027,7 +28027,13 @@ async function run() {
         }
     }
     catch (error) {
-        if (error instanceof Error) {
+        if (error instanceof AggregateError) {
+            core.setFailed(`Multiple errors returned`);
+            for (const err of error.errors) {
+                core.error(`Error ${error.errors.indexOf(err)}: ${err.message}`);
+            }
+        }
+        else if (error instanceof Error) {
             core.setFailed(error.message);
         }
         else {
