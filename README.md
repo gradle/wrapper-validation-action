@@ -4,7 +4,9 @@
 
 # Gradle Wrapper Validation Action
 
-This action validates the checksums of [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) JAR files present in the source tree and fails if unknown Gradle Wrapper JAR files are found.
+This action validates the checksums of _all_ [Gradle Wrapper](https://docs.gradle.org/current/userguide/gradle_wrapper.html) JAR files present in the repository and fails if any unknown Gradle Wrapper JAR files are found.
+
+The action should be run in the root of the repository, as it will recursively search for any files named `gradle-wrapper.jar`.
 
 ## The Gradle Wrapper Problem in Open Source
 
