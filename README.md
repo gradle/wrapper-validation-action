@@ -49,6 +49,8 @@ Simply add this action to your workflow **after** having checked out your source
 uses: gradle/wrapper-validation-action@v2
 ```
 
+This action step should precede any step using `gradle/gradle-build-action` or `gradle/actions/setup-gradle`.
+
 ### Add a new dedicated Workflow
 
 Here's a sample complete workflow you can add to your repositories:
