@@ -15,6 +15,10 @@ inputs:
     description: 'Accept arbitrary user-defined checksums as valid. Comma separated list of SHA256 checksums (lowercase hex).'
     required: false
     default: ''
+  detect-version:
+    description: 'Searches for the Gradle version defined in the gradle-wrapper.properties file to limit checksum verification to these versions. Boolean, true or false.'
+    required: false
+    default: 'false'
 
 outputs:
   failed-wrapper:

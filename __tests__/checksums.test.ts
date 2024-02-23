@@ -21,7 +21,7 @@ test('has loaded hardcoded wrapper jars checksums', async () => {
 })
 
 test('fetches wrapper jars checksums', async () => {
-  const validChecksums = await checksums.fetchValidChecksums(false)
+  const validChecksums = await checksums.fetchValidChecksums(false, false, [])
   expect(validChecksums.size).toBeGreaterThan(10)
   // Verify that checksum of arbitrary version is contained
   expect(
@@ -30,6 +30,13 @@ test('fetches wrapper jars checksums', async () => {
       '28b330c20a9a73881dfe9702df78d4d78bf72368e8906c70080ab6932462fe9e'
     )
   ).toBe(true)
+})
+
+test('fetches wrapper jars checksums only for detected versions', async () => {
+  const validChecksums = await checksums.fetchValidChecksums(false, true, [
+    '8.2.1'
+  ])
+  expect(validChecksums.size).toBe(1)
 })
 
 describe('retry', () => {
@@ -47,7 +54,11 @@ describe('retry', () => {
           code: 'ECONNREFUSED'
         })
 
-      const validChecksums = await checksums.fetchValidChecksums(false)
+      const validChecksums = await checksums.fetchValidChecksums(
+        false,
+        false,
+        []
+      )
       expect(validChecksums.size).toBeGreaterThan(10)
       nock.isDone()
     })

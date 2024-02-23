@@ -7,6 +7,7 @@ export async function findInvalidWrapperJars(
   minWrapperCount: number,
   allowSnapshots: boolean,
   allowedChecksums: string[],
+  detectVersions: boolean,
   knownValidChecksums: Map<
     string,
     Set<string>
@@ -33,8 +34,18 @@ export async function findInvalidWrapperJars(
     // Otherwise fall back to fetching checksums from Gradle API and compare against them
     if (notYetValidatedWrappers.length > 0) {
       result.fetchedChecksums = true
-      const fetchedValidChecksums =
-        await checksums.fetchValidChecksums(allowSnapshots)
+
+      let detectedVersions: string[]
+      if (detectVersions) {
+        detectedVersions = await find.detectVersions(wrapperJars)
+      } else {
+        detectedVersions = []
+      }
+      const fetchedValidChecksums = await checksums.fetchValidChecksums(
+        allowSnapshots,
+        detectVersions,
+        detectedVersions
+      )
 
       for (const wrapperJar of notYetValidatedWrappers) {
         if (!fetchedValidChecksums.has(wrapperJar.checksum)) {

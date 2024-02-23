@@ -9,7 +9,8 @@ export async function run(): Promise<void> {
       path.resolve('.'),
       +core.getInput('min-wrapper-count'),
       core.getInput('allow-snapshots') === 'true',
-      core.getInput('allow-checksums').split(',')
+      core.getInput('allow-checksums').split(','),
+      core.getInput('detect-version') === 'true'
     )
     if (result.isValid()) {
       core.info(result.toDisplayString())
