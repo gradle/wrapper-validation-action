@@ -1,0 +1,22 @@
+# Pull request authors are not expected to update `action/index.js` themselves
+name: Check no dist update
+on:
+  pull_request:
+    # For simplicity determine if the file was changed using `paths` here (instead of running any diff command below)
+    # There are some limitations to this, but they most likely won't cause any issues here
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#git-diff-comparisons
+    paths:
+      - 'action/index.js'
+
+jobs:
+  check-no-dist-update:
+    name: Check no dist update
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check no dist update
+      # Fail unconditionally; this workflow is only run if the file has changed, see
+      # condition at the start of this file
+      run: |
+        echo "Pull requests should not update 'action/index.js'"
+        exit 1

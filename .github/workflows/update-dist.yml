@@ -1,0 +1,50 @@
+name: Update `action/index.js`
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-dist:
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Allow the job to push the changed file to the repository
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: npm
+
+    - name: Build and test
+      run: |
+        npm -v
+        node -v
+        npm clean-install
+        npm run github_ci_all
+
+    # To be safe, verify that either there are no changes or only `action/index.js` has changed
+    - name: Verify no unexpected changes
+      run: |
+        # Check for changes to any file other than `action/index.js`,
+        # see https://stackoverflow.com/a/29374503
+        # Note that this does not detect new untracked files
+        if ! git diff --exit-code --quiet -- . ':!action/index.js'; then
+          echo "Unexpected changes:"
+          git diff -- . ':!action/index.js'
+          exit 1
+        fi
+
+    # Commit and push changes; has no effect if the file did not change
+    # Important: The push event will not trigger any other workflows, see
+    # https://github.com/stefanzweifel/git-auto-commit-action?tab=readme-ov-file#commits-made-by-this-action-do-not-trigger-new-workflow-runs
+    - name: Commit & push changes
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: 'Update `action/index.js`'
+        file_pattern: 'action/index.js'

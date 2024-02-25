@@ -36,13 +36,13 @@ jobs:
       with:
         node-version: 20
 
-    - name: Build action (pull request)
-      # Pull requests are not expected to update `dist/index.js` themselves; therefore build `dist/index.js`
-      # here before running integration test
-      if: github.event_name == 'pull_request'
+    - name: Build action
+      # Pull requests are not expected to update `action/index.js`, and pushes to the `main` branch
+      # might not have updated the file either (and rely on CI to do that), therefore build the
+      # action here first
       run: |
         npm clean-install
-        npm run build
+        npm run github_ci_all
 
     - name: Run wrapper-validation-action
       id: action-test
@@ -76,13 +76,13 @@ jobs:
       with:
         node-version: 20
 
-    - name: Build action (pull request)
-      # Pull requests are not expected to update `dist/index.js` themselves; therefore build `dist/index.js`
-      # here before running integration test
-      if: github.event_name == 'pull_request'
+    - name: Build action
+      # Pull requests are not expected to update `action/index.js`, and pushes to the `main` branch
+      # might not have updated the file either (and rely on CI to do that), therefore build the
+      # action here first
       run: |
         npm clean-install
-        npm run build
+        npm run github_ci_all
 
     - name: Run wrapper-validation-action
       id: action-test

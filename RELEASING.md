@@ -1,9 +1,10 @@
 # Release
 
 * starting on `main`
-* `npm install`
+* `npm clean-install`
 * `npm run all`
-* Commit and push any changes to the `dist` directory. Wait for CI.
+* verify that `dist/index.js` matches `action/index.js`
+* if not, commit and push the changes, then wait for CI to finish
 * `git tag v1.0.x && git push --tags` with the actual version number
 * `git tag -f -a v1 && git push -f --tags`
 * go to https://github.com/gradle/wrapper-validation-action/releases
