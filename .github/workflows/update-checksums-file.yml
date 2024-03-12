@@ -7,6 +7,12 @@ on:
   # Support running workflow manually
   workflow_dispatch:
 
+permissions:
+  # Allow creation of branch for checksums file update
+  contents: write
+  # Allow creation of pull request
+  pull-requests: write
+
 jobs:
   update-checksums:
     name: Update checksums

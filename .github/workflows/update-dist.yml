@@ -4,13 +4,13 @@ on:
     branches:
       - main
 
+permissions:
+  # Allow the workflow to push the changed file to the repository
+  contents: write
+
 jobs:
   update-dist:
     runs-on: ubuntu-latest
-
-    permissions:
-      # Allow the job to push the changed file to the repository
-      contents: write
 
     steps:
     - uses: actions/checkout@v4

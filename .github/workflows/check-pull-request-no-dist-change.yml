@@ -8,6 +8,9 @@ on:
     paths:
       - 'action/index.js'
 
+permissions:
+  contents: read
+
 jobs:
   check-no-dist-update:
     name: Check no dist update
