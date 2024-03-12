@@ -10,6 +10,8 @@ on:
 jobs:
   update-checksums:
     name: Update checksums
+    # Only run for Gradle repository, but not for forks
+    if: github.repository == 'gradle/wrapper-validation-action'
     runs-on: ubuntu-latest
 
     steps:
