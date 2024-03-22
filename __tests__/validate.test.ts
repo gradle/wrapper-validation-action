@@ -7,9 +7,13 @@ jest.setTimeout(30000)
 const baseDir = path.resolve('.')
 
 test('succeeds if all found wrapper jars are valid', async () => {
-  const result = await validate.findInvalidWrapperJars(baseDir, 3, false, [
-    'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
-  ])
+  const result = await validate.findInvalidWrapperJars(
+    baseDir,
+    3,
+    false,
+    ['e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'],
+    false
+  )
 
   expect(result.isValid()).toBe(true)
   // Only hardcoded and explicitly allowed checksums should have been used
@@ -30,6 +34,7 @@ test('succeeds if all found wrapper jars are valid (and checksums are fetched fr
     1,
     false,
     ['e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'],
+    false,
     knownValidChecksums
   )
 
@@ -46,7 +51,51 @@ test('succeeds if all found wrapper jars are valid (and checksums are fetched fr
 })
 
 test('fails if invalid wrapper jars are found', async () => {
-  const result = await validate.findInvalidWrapperJars(baseDir, 3, false, [])
+  const result = await validate.findInvalidWrapperJars(
+    baseDir,
+    3,
+    false,
+    [],
+    false
+  )
+
+  expect(result.isValid()).toBe(false)
+
+  expect(result.valid).toEqual([
+    new validate.WrapperJar(
+      '__tests__/data/valid/gradle-wrapper.jar',
+      '3888c76faa032ea8394b8a54e04ce2227ab1f4be64f65d450f8509fe112d38ce'
+    )
+  ])
+
+  expect(result.invalid).toEqual([
+    new validate.WrapperJar(
+      '__tests__/data/invalid/gradle-wrapper.jar',
+      'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+    ),
+    new validate.WrapperJar(
+      '__tests__/data/invalid/gradlе-wrapper.jar', // homoglyph
+      'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+    )
+  ])
+
+  expect(result.toDisplayString()).toBe(
+    '✗ Found unknown Gradle Wrapper JAR files:\n' +
+      '  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 __tests__/data/invalid/gradle-wrapper.jar\n' +
+      '  e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 __tests__/data/invalid/gradlе-wrapper.jar\n' + // homoglyph
+      '✓ Found known Gradle Wrapper JAR files:\n' +
+      '  3888c76faa032ea8394b8a54e04ce2227ab1f4be64f65d450f8509fe112d38ce __tests__/data/valid/gradle-wrapper.jar'
+  )
+})
+
+test('fails if invalid wrapper jars are found when detection versions from `gradle-wrapper.properties`', async () => {
+  const result = await validate.findInvalidWrapperJars(
+    baseDir,
+    3,
+    false,
+    [],
+    true
+  )
 
   expect(result.isValid()).toBe(false)
 
@@ -78,7 +127,13 @@ test('fails if invalid wrapper jars are found', async () => {
 })
 
 test('fails if not enough wrapper jars are found', async () => {
-  const result = await validate.findInvalidWrapperJars(baseDir, 4, false, [])
+  const result = await validate.findInvalidWrapperJars(
+    baseDir,
+    4,
+    false,
+    [],
+    false
+  )
 
   expect(result.isValid()).toBe(false)
 
