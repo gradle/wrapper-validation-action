@@ -38,6 +38,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 20
+        cache: npm
 
     - name: Build action
       # Pull requests are not expected to update `action/index.js`, and pushes to the `main` branch
@@ -78,6 +79,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 20
+        cache: npm
 
     - name: Build action
       # Pull requests are not expected to update `action/index.js`, and pushes to the `main` branch
