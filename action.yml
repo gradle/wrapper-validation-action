@@ -22,7 +22,7 @@ outputs:
 
 runs:
   using: 'node20'
-  main: 'dist/index.js'
+  main: 'action/index.js'
 
 branding:
   icon: 'shield'

@@ -12,7 +12,8 @@
     "compile": "ncc build",
     "test": "jest",
     "build": "npm run check && npm run compile",
-    "all": "npm run build && npm test"
+    "all": "npm run build && npm test",
+    "github_ci_all": "npm run all && cp dist/index.js action/index.js"
   },
   "repository": {
     "type": "git",

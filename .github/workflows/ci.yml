@@ -6,6 +6,9 @@ on: # rebuild any PRs and main branch changes
       - main
       - 'releases/*'
 
+permissions:
+  contents: read
+
 jobs:
   build: # make sure build/ci work properly
     runs-on: ubuntu-latest
@@ -35,14 +38,15 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 20
+        cache: npm
 
-    - name: Build action (pull request)
-      # Pull requests are not expected to update `dist/index.js` themselves; therefore build `dist/index.js`
-      # here before running integration test
-      if: github.event_name == 'pull_request'
+    - name: Build action
+      # Pull requests are not expected to update `action/index.js`, and pushes to the `main` branch
+      # might not have updated the file either (and rely on CI to do that), therefore build the
+      # action here first
       run: |
         npm clean-install
-        npm run build
+        npm run github_ci_all
 
     - name: Run wrapper-validation-action
       id: action-test
@@ -75,14 +79,15 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 20
+        cache: npm
 
-    - name: Build action (pull request)
-      # Pull requests are not expected to update `dist/index.js` themselves; therefore build `dist/index.js`
-      # here before running integration test
-      if: github.event_name == 'pull_request'
+    - name: Build action
+      # Pull requests are not expected to update `action/index.js`, and pushes to the `main` branch
+      # might not have updated the file either (and rely on CI to do that), therefore build the
+      # action here first
       run: |
         npm clean-install
-        npm run build
+        npm run github_ci_all
 
     - name: Run wrapper-validation-action
       id: action-test

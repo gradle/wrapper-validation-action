@@ -100,3 +100,7 @@ lib/**/*
 
 .idea/
 *.iml
+
+# Ignore `index.js` file created during build; it is copied by CI to a separate directory
+# Otherwise authors of PRs would commit it, causing merge conflicts or erroneous merges
+/dist
