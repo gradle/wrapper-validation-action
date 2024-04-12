@@ -8,14 +8,3 @@ updates:
       github-actions:
         patterns:
         - "*"
-
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    ignore:
-      - dependency-name: "@types/node"
-    groups:
-      npm-dependencies:
-        patterns:
-        - "*"
