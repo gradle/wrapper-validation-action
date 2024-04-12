@@ -19,10 +19,20 @@ inputs:
 outputs:
   failed-wrapper:
     description: 'The path of the Gradle Wrapper(s) JAR that failed validation. Path is a platform-dependent relative path to git repository root. Multiple paths are separated by a | character.'
+    value: ${{ steps.wrapper-validation.outputs.failed-wrapper }}
 
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: "composite"
+  steps:
+    - name: Wrapper Validation
+      id: wrapper-validation
+      uses: gradle/actions/wrapper-validation@v3.3.0
+      with:
+        min-wrapper-count: ${{ inputs.min-wrapper-count }}
+        allow-snapshots: ${{ inputs.allow-snapshots }}
+        allow-checksums: ${{ inputs.allow-checksums }}
+      env:
+        GRADLE_ACTION_ID: gradle/wrapper-validation-action
 
 branding:
   icon: 'shield'

@@ -7,22 +7,6 @@ on: # rebuild any PRs and main branch changes
       - 'releases/*'
 
 jobs:
-  build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-        cache: npm
-    - name: Build and test
-      run: |
-        npm -v
-        node -v
-        npm clean-install
-        npm run all
-
 
   # Integration test for successful validation of wrappers
   test-validation-success:
@@ -30,19 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-
-    - name: Build action (pull request)
-      # Pull requests are not expected to update `dist/index.js` themselves; therefore build `dist/index.js`
-      # here before running integration test
-      if: github.event_name == 'pull_request'
-      run: |
-        npm clean-install
-        npm run build
 
     - name: Run wrapper-validation-action
       id: action-test
@@ -70,19 +41,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
-
-    - name: Build action (pull request)
-      # Pull requests are not expected to update `dist/index.js` themselves; therefore build `dist/index.js`
-      # here before running integration test
-      if: github.event_name == 'pull_request'
-      run: |
-        npm clean-install
-        npm run build
 
     - name: Run wrapper-validation-action
       id: action-test
