@@ -10,7 +10,7 @@ jobs:
 
   # Integration test for successful validation of wrappers
   test-validation-success:
-    name: 'Test: Validation success'
+    name: 'Test: Daniel Validation success'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
 
   # Integration test for failing validation of wrappers
   test-validation-error:
-    name: 'Test: Validation error'
+    name: 'Test: Daniel Validation error'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
