@@ -26,7 +26,7 @@ runs:
   steps:
     - name: Wrapper Validation
       id: wrapper-validation
-      uses: gradle/actions/wrapper-validation@v3.4.0
+      uses: gradle/actions/wrapper-validation@v3.4.1
       with:
         min-wrapper-count: ${{ inputs.min-wrapper-count }}
         allow-snapshots: ${{ inputs.allow-snapshots }}
